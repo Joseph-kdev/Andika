@@ -6,3 +6,12 @@
  
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1px); }
+  75% { transform: translateX(1px); }
+}
+
+.trash-hover:hover {
+  animation: shake 0.3s ease-in-out infinite;
+}

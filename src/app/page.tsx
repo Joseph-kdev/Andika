@@ -6,6 +6,11 @@ import { v4 as uuid4 } from "uuid";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import NotePreview from "@/components/NotePreview";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import remarkBreaks from "remark-breaks";
 
 export default function Home() {
   const addNote = useNoteStore((state) => state.addNote);
@@ -30,9 +35,9 @@ export default function Home() {
   };
 
   const handleModalClose = () => {
-    setIsModalOpen(false)
-    setSelectedNote(null)
-  }
+    setIsModalOpen(false);
+    setSelectedNote(null);
+  };
 
   const createNew = () => {
     const noteId = uuid4();
@@ -55,7 +60,7 @@ export default function Home() {
             <svg
               width="24px"
               height="24px"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -88,9 +93,14 @@ export default function Home() {
                 onClick={() => handleNoteSelect(n)}
               >
                 <h2 className="text-xl font-semibold">{n.title}</h2>
-                <p className="text-sm mt-1">
-                  {_.truncate(n.content, { length: 50, omission: "..." })}
-                </p>
+                <div className="text-sm mt-1">
+                  <Markdown
+                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                    rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                  >
+                    {_.truncate(n.content, { length: 50, omission: "..." })}
+                  </Markdown>
+                </div>
               </li>
             ))}
           </ul>
@@ -106,7 +116,7 @@ export default function Home() {
       {/* for mobile interfaces */}
       {isModalOpen && selectedNote && (
         <div className="md:hidden fixed inset-0 bg-[rgba(0,0,0,0.8)] flex items-center justify-center p-4">
-          <div className="bg-white w-full h-[80vh] max-w-md rounded-lg overflow-y-auto relative">
+          <div className="bg-white w-full h-[80vh] max-w-md rounded-lg overflow-y-scroll relative">
             <button
               onClick={handleModalClose}
               className="absolute top-2 right-2 p-2"
@@ -123,7 +133,9 @@ export default function Home() {
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
-            <NotePreview note={selectedNote} />
+            <div className="py-4 mt-4">
+              <NotePreview note={selectedNote} />
+            </div>
           </div>
         </div>
       )}

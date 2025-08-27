@@ -13,6 +13,7 @@ import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Selection } from "@tiptap/extensions"
+import {Markdown} from "tiptap-markdown"
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -209,6 +210,12 @@ export function SimpleEditor({ content, onChange} : EditorProps) {
     extensions: [
       StarterKit.configure({
         horizontalRule: false,
+        codeBlock: {
+          HTMLAttributes: {
+            class: 'code-block',
+          },
+          languageClassPrefix: 'language-',
+        },
         link: {
           openOnClick: false,
           enableClickSelection: true,
@@ -231,11 +238,20 @@ export function SimpleEditor({ content, onChange} : EditorProps) {
         upload: handleImageUpload,
         onError: (error) => console.error("Upload failed:", error),
       }),
+      Markdown.configure({
+        transformCopiedText: true,
+        transformPastedText: true,
+        breaks: true,
+        html: false,
+        tightLists: true,
+        bulletListMarker: '-',
+        linkify: true,
+      }),
     ],
     content,
     onUpdate: ({editor}) => {
-      const textContent = editor.getText()
-      onChange(textContent)
+      const markdown = editor.storage.markdown.getMarkdown();
+      onChange(markdown);
     }
   })
 

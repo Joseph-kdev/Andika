@@ -2,7 +2,7 @@
 
 import Editor from "@/components/editor";
 import { useNoteStore } from "@/stores/useNoteStore";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { debounce } from "lodash";
 
@@ -10,8 +10,9 @@ export default function EdittingPage() {
   const { id } = useParams<{ id: string }>();
   const note = useNoteStore((state) => state.notes.find((n) => n.id === id));
   const updateNote = useNoteStore((state) => state.updateNote);
-  const addNote = useNoteStore((state) => state.addNote);
+  const router = useRouter()
   const [title, setTitle] = useState(note?.title || "");
+  const [isSaving, setIsSaving] = useState(false)
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
@@ -24,10 +25,10 @@ export default function EdittingPage() {
 
   // Handle missing note
   useEffect(() => {
-    if (!note) {
-      addNote({ id, title: "", content: "" });
+    if(!note) {
+      router.push("/")
     }
-  }, [id, note, addNote]);
+  }, []);
 
     // Cleanup debounced functions
   useEffect(() => {
@@ -35,20 +36,52 @@ export default function EdittingPage() {
       handleContentChange.cancel();
     };
   }, [handleContentChange]);
+
+  const handleSave = () => {
+    try {
+      setIsSaving(true);
+      handleContentChange.cancel();
+      
+      updateNote(id, { 
+        title, 
+        content: note?.content || '' 
+      });
+      
+      // Show success state
+      setTimeout(() => {
+        setIsSaving(false);
+      }, 1000);
+    } catch (error) {
+      // Handle error
+      setIsSaving(false);
+      console.error('Failed to save:', error);
+    }
+  }
   
   return (
-    <div>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => handleTitleChange(e.target.value)}
-        placeholder="Note title"
-      />
-      {note ? (
-        <Editor content={note?.content} onContentChange={handleContentChange} />
-      ) : (
-        <div>loading..</div>
-      )}
+    <div className="p-2">
+      <div className="flex justify-between md:px-[15%]">
+        <div>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            placeholder="Note title"
+            className="py-2 focus:outline-none text-xl"
+          />
+          <hr />
+        </div>
+        <button className={`border p-2 cursor-pointer ${isSaving ? 'bg-green-500 border-green-500' : "border-amber-500"}`} onClick={handleSave}>
+          {isSaving ? 'Saved!' : 'Save'}
+        </button>
+      </div>
+      <div>
+        {note ? (
+          <Editor content={note?.content} onContentChange={handleContentChange} />
+        ) : (
+          <div>loading..</div>
+        )}
+      </div>
     </div>
   );
 }
