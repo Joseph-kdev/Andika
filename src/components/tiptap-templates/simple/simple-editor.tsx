@@ -13,7 +13,7 @@ import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Selection } from "@tiptap/extensions"
-import {Markdown} from "tiptap-markdown"
+import { Markdown } from 'tiptap-markdown-3';
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -196,8 +196,11 @@ export function SimpleEditor({ content, onChange} : EditorProps) {
   const toolbarRef = React.useRef<HTMLDivElement>(null)
 
   const editor = useEditor({
-    immediatelyRender: false,
+    immediatelyRender: true, // Changed from false
     shouldRerenderOnTransaction: false,
+    parseOptions: {
+      preserveWhitespace: 'full',
+    },
     editorProps: {
       attributes: {
         autocomplete: "off",
@@ -249,7 +252,7 @@ export function SimpleEditor({ content, onChange} : EditorProps) {
       }),
     ],
     content,
-    onUpdate: ({editor}) => {
+    onUpdate: ({ editor }) => {
       const markdown = editor.storage.markdown.getMarkdown();
       onChange(markdown);
     }

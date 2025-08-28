@@ -1,42 +1,65 @@
 "use client"
 
-import React, { useCallback, useEffect, useState} from 'react'
+import React, { useCallback, useEffect, MutableRefObject } from 'react'
 import "easymde/dist/easymde.min.css";
 import { SimpleEditor } from './tiptap-templates/simple/simple-editor';
-import { debounce } from 'lodash';
+import { useSidebar } from "@/components/ui/sidebar";
 
 interface EditorProps {
     content: string;
-    onContentChange: (content: string) => void;
+    contentRef: MutableRefObject<string>;
+    hasUnsavedChanges: MutableRefObject<boolean>;
+    onContentChange: (id: string, updates: { content: string }) => void;
+    noteId: string;
 }
 
-export default function Editor({ content, onContentChange }: EditorProps) {
-    const [value, setValue] = useState(content);
+export default function Editor({ 
+  content, 
+  contentRef, 
+  hasUnsavedChanges, 
+  onContentChange,
+  noteId
+}: EditorProps) {
+  const handleChange = useCallback((newContent: string) => {
+    contentRef.current = newContent;
+    hasUnsavedChanges.current = true;
+  }, [contentRef, hasUnsavedChanges]);
 
-  const debouncedOnChange = useCallback(
-    debounce((textContent: string) => {
-      onContentChange(textContent);
-    }, 1000),
-    [onContentChange]
-  );
-
-  //handle editor changes
-  const handleChange = useCallback(
-    (textContent: string) => {
-        setValue(textContent)
-        debouncedOnChange(textContent)
-    }, [debouncedOnChange])
-
-    // Cleanup debounced function
+  // Autosave after 5 minutes
   useEffect(() => {
-    return () => {
-      debouncedOnChange.cancel();
-    };
-  }, [debouncedOnChange]);
+    const interval = setInterval(() => {
+      if (hasUnsavedChanges.current) {
+        onContentChange(noteId, { content: contentRef.current });
+        hasUnsavedChanges.current = false;
+      }
+    }, 5 * 60 * 1000);
 
+    return () => clearInterval(interval);
+  }, [onContentChange, noteId, contentRef]);
+
+  // Add warning when leaving page with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges.current) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+  
+  const { state: sidebarState } = useSidebar();
+  
   return (
-    <div>
-        <SimpleEditor content={value} onChange={handleChange} />
+    <div className={`h-full overflow-y-auto transition-all duration-300 ${
+      sidebarState === "collapsed" ? "md:px-6" : "md:px-4"
+    }`}>
+      <SimpleEditor 
+        content={content} 
+        onChange={handleChange} 
+      />
     </div>
-  )
+  );
 }

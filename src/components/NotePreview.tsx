@@ -9,7 +9,6 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import remarkBreaks from "remark-breaks";
-import { TrashFront, TrashBack } from './trash-bins'
 
 export default function NotePreview({ note }: { note: Note }) {
   const router = useRouter();
@@ -19,7 +18,7 @@ export default function NotePreview({ note }: { note: Note }) {
   const removeNote = useNoteStore(store => store.removeNote)
 
   const handleEdit = () => {
-    router.push(`editor/${note.id}`);
+    router.push(`notes/editor/${note.id}`);
   };
 
   const handleDelete = () => {
@@ -28,11 +27,9 @@ export default function NotePreview({ note }: { note: Note }) {
 
   const handleConfirmDelete = () => {
     setIsDeleting(true);
-    // Wait for animation to complete before actual deletion
-    setTimeout(() => {
-      removeNote(note.id);
-      setReadyRemove(false)
-    }, 1000);
+    removeNote(note.id);
+    setIsDeleting(false)
+    setReadyRemove(false)
   };
 
   return (
@@ -105,46 +102,6 @@ export default function NotePreview({ note }: { note: Note }) {
             ></path>
           </svg>
         </button>
-        <button className="cursor-pointer">
-          <svg
-            width="24px"
-            height="24px"
-            strokeWidth="1.5"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            color="#000000"
-          >
-            <path
-              d="M9 9L4 4M4 4V8M4 4H8"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
-            <path
-              d="M15 9L20 4M20 4V8M20 4H16"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
-            <path
-              d="M9 15L4 20M4 20V16M4 20H8"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
-            <path
-              d="M15 15L20 20M20 20V16M20 20H16"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
-          </svg>
-        </button>
       </div>
       {/* mobile action buttons */}
       <div className="md:hidden flex items-center absolute top-3 gap-2">
@@ -160,56 +117,6 @@ export default function NotePreview({ note }: { note: Note }) {
           >
             <path
               d="M14.3632 5.65156L15.8431 4.17157C16.6242 3.39052 17.8905 3.39052 18.6716 4.17157L20.0858 5.58579C20.8668 6.36683 20.8668 7.63316 20.0858 8.41421L18.6058 9.8942M14.3632 5.65156L4.74749 15.2672C4.41542 15.5993 4.21079 16.0376 4.16947 16.5054L3.92738 19.2459C3.87261 19.8659 4.39148 20.3848 5.0115 20.33L7.75191 20.0879C8.21972 20.0466 8.65806 19.8419 8.99013 19.5099L18.6058 9.8942M14.3632 5.65156L18.6058 9.8942"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
-          </svg>
-        </button>
-        <button className="p-1 border rounded-full">
-          <svg
-            width="20px"
-            height="20px"
-            strokeWidth="1.5"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            color="#000000"
-          >
-            <path
-              d="M12 21V7C12 5.89543 12.8954 5 14 5H21.4C21.7314 5 22 5.26863 22 5.6V18.7143"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            ></path>
-            <path
-              d="M12 21V7C12 5.89543 11.1046 5 10 5H2.6C2.26863 5 2 5.26863 2 5.6V18.7143"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            ></path>
-            <path
-              d="M14 19L22 19"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            ></path>
-            <path
-              d="M10 19L2 19"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            ></path>
-            <path
-              d="M12 21C12 19.8954 12.8954 19 14 19"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
-            <path
-              d="M12 21C12 19.8954 11.1046 19 10 19"
               stroke="#000000"
               strokeWidth="1.5"
               strokeLinecap="round"
