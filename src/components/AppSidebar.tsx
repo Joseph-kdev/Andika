@@ -1,5 +1,5 @@
 "use client"
-import { Calendar, Home, Inbox, Search } from "lucide-react";
+import { Calendar, Edit2, FileText, Home, Inbox, Search, Target } from "lucide-react";
 
 import {
   Sidebar,
@@ -7,6 +7,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -24,17 +25,17 @@ const items = [
   {
     title: "Notes",
     url: "/notes",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
+    icon: FileText,
   },
   {
     title: "Tasks",
     url: "#",
-    icon: Search,
+    icon: Target,
+  },
+  {
+    title: "Journal",
+    url: "#",
+    icon: Edit2,
   },
 ];
 
@@ -44,8 +45,10 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
+        <SidebarHeader>
+          Logo
+        </SidebarHeader>
         <SidebarGroup>
-          <SidebarGroupLabel>Logo</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (

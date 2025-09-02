@@ -12,6 +12,7 @@ import rehypeSanitize from "rehype-sanitize";
 import remarkBreaks from "remark-breaks";
 import _ from "lodash";
 import { useSidebar } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 
 export default function EditingPage() {
   const { id } = useParams<{ id: string }>();
@@ -68,14 +69,14 @@ export default function EditingPage() {
   }, [note]);
   
   return (
-    <div className="flex h-screen w-full">
+    <div className={`flex h-screen w-screen ${sidebarState === 'expanded' ? 'md:w-[calc(100vw-16rem)]' : 'md:w-[calc(100vw-5rem)]'}`}>
       {/* Notes List - Hidden on mobile */}
-      <div className={`hidden md:block border-r overflow-y-auto transition-all duration-300 ${
-        sidebarState === "collapsed" ? "" : ""
+      <div className={`hidden md:block overflow-y-auto transition-all duration-300 ${
+        sidebarState === 'expanded' ? 'md:w-1/3 mx-1' : 'md:w-1/4 mx-2'
       }`}>
         <button
           onClick={createNew}
-          className="border w-full flex items-center p-2 gap-4 cursor-pointer hover:bg-gray-50"
+          className="border w-full flex items-center p-2 gap-4 cursor-pointer hover:bg-gray-50 rounded-4xl"
         >
           <svg
             width="24px"
@@ -106,7 +107,7 @@ export default function EditingPage() {
         <ul className="mt-2">
           {notes.map((n) => (
             <li
-              className={`px-2 py-4 shadow-md cursor-pointer ${
+              className={`px-2 py-4 shadow-md cursor-pointer rounded-xl ${
                 id === n.id ? "bg-gray-800 text-white" : ""
               }`}
               key={n.id}
@@ -125,14 +126,17 @@ export default function EditingPage() {
           ))}
         </ul>
       </div>
+
       {/* Editor Area */}
-      <div className="flex-1 overflow-hidden transition-all duration-300">
+      <div className={`flex-1 overflow-hidden transition-all duration-300 ${
+        sidebarState === 'expanded' ? 'md:w-2/3' : 'md:w-3/4'
+      }`}>
         <div className="p-2">
           <div className="flex w-full justify-center">
             <div className={`flex justify-between w-full transition-all duration-300 ${
               sidebarState === "collapsed" 
-                ? "md:px-[7%]" 
-                : "md:px-5"
+                ? "md:min-w-[940px]" 
+                : "md:min-w-[748px]"
             }`}>
               <div className="flex-1">
                 <input
@@ -144,20 +148,21 @@ export default function EditingPage() {
                 />
                 <hr />
               </div>
-              <button 
+              <Button 
                 className={`ml-4 border p-2 cursor-pointer ${
                   isSaving ? 'bg-green-500 border-green-500' : "border-amber-500"
                 }`} 
                 onClick={handleSave}
+                variant={"secondary"}
               >
                 {isSaving ? 'Saved!' : 'Save'}
-              </button>
+              </Button>
             </div>
           </div>
-          <div className={`mx-auto transition-all duration-300 ${
+          <div className={`mx-auto transition-all duration-300 mt-1 ${
             sidebarState === "collapsed" 
-              ? "md:px-[5%]" 
-              : ""
+              ? "md:min-w-[960px]" 
+              : "md:min-w-[748px]"
           }`}>
             {note ? (
               <Editor 

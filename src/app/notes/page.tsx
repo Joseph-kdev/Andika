@@ -11,13 +11,15 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import remarkBreaks from "remark-breaks";
+import { useSidebar } from "@/components/ui/sidebar";
 
-export default function Home() {
+export default function Notes() {
   const addNote = useNoteStore((state) => state.addNote);
   const router = useRouter();
   const notes = useNoteStore((state) => state.notes);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { state: sidebarState } = useSidebar()
 
   useEffect(() => {
     if (window.innerWidth > 768) {
@@ -50,12 +52,12 @@ export default function Home() {
   };
 
   return (
-    <div className="p-1 w-full">
-      <div className="md:flex flex-row gap-2">
-        <div className="md:w-1/3">
+    <div className={`p-1 w-screen ${sidebarState === 'expanded' ? 'md:w-[calc(100vw-16rem)]' : 'md:w-[calc(100vw-5rem)]' }`}>
+      <div className={`md:flex flex-row ${sidebarState === 'expanded' ? 'md:gap-2' : 'md:gap-2 justify-center'}`}>
+        <div className={`${sidebarState === 'expanded' ? 'md:w-1/3 mx-1' : 'md:w-1/3 mx-2'}`}>
           <button
             onClick={createNew}
-            className="border w-full flex items-center p-2 gap-4 cursor-pointer"
+            className="border w-full flex items-center p-2 gap-4 cursor-pointer rounded-4xl"
           >
             <svg
               width="24px"
@@ -86,7 +88,7 @@ export default function Home() {
           <ul className="mt-2">
             {notes.map((n) => (
               <li
-                className={`px-2 py-4 shadow-md cursor-pointer ${
+                className={`px-2 py-4 shadow-md cursor-pointer rounded-xl ${
                   selectedNote?.id === n.id ? "bg-gray-800 text-white" : ""
                 }`}
                 key={n.id}
@@ -107,7 +109,7 @@ export default function Home() {
         </div>
         {/* for desktop interfaces */}
         {selectedNote && (
-          <div className="hidden md:block w-2/3 border">
+          <div className={`hidden md:block border ${sidebarState === 'expanded' ? 'md:w-3/4' : 'md:w-4/5'}`}>
             <NotePreview note={selectedNote} />
           </div>
         )}
