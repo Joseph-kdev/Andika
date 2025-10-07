@@ -34,6 +34,7 @@
     "lodash": "^4.17.21",
     "lodash.throttle": "^4.1.1",
     "lucide-react": "^0.542.0",
+    "motion": "^12.23.22",
     "next": "15.5.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -46,6 +47,7 @@
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.3.1",
     "tiptap-markdown-3": "^0.8.12",
+    "usehooks-ts": "^3.1.1",
     "uuid": "^11.1.0",
     "zustand": "^5.0.8"
   },

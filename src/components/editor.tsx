@@ -54,7 +54,7 @@ export default function Editor({
   
   return (
     <div className={`h-full overflow-y-auto transition-all duration-300 ${
-      sidebarState === "collapsed" ? "md:px-6" : "md:px-4"
+      sidebarState === "collapsed" ? "md:px-4" : "md:px-2"
     }`}>
       <SimpleEditor 
         content={content} 

@@ -13,6 +13,7 @@ import remarkBreaks from "remark-breaks";
 import _ from "lodash";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
 
 export default function EditingPage() {
   const { id } = useParams<{ id: string }>();
@@ -35,19 +36,19 @@ export default function EditingPage() {
   const handleSave = () => {
     try {
       setIsSaving(true);
-      updateNote(id, { 
-        title, 
-        content: contentRef.current
+      updateNote(id, {
+        title,
+        content: contentRef.current,
       });
-      
+
       hasUnsavedChanges.current = false;
-      
+
       setTimeout(() => {
         setIsSaving(false);
       }, 1000);
     } catch (error) {
       setIsSaving(false);
-      console.error('Failed to save:', error);
+      console.error("Failed to save:", error);
     }
   };
 
@@ -57,23 +58,34 @@ export default function EditingPage() {
       id: noteId,
       title: "",
       content: "",
+      createdAt: new Date().toISOString(),
+      modifiedAt: new Date().toISOString(),
+      tag: ''
     });
     router.push(`/notes/editor/${noteId}`);
   };
 
   // Handle missing note
   useEffect(() => {
-    if(!note) {
-      router.push("/notes")
+    if (!note) {
+      router.push("/notes");
     }
   }, [note]);
-  
+
   return (
-    <div className={`flex h-screen w-screen ${sidebarState === 'expanded' ? 'md:w-[calc(100vw-16rem)]' : 'md:w-[calc(100vw-5rem)]'}`}>
+    <div
+      className={`flex h-screen w-screen ${
+        sidebarState === "expanded"
+          ? "md:w-[calc(100vw-16rem)]"
+          : "md:w-[calc(100vw-5rem)]"
+      }`}
+    >
       {/* Notes List - Hidden on mobile */}
-      <div className={`hidden md:block overflow-y-auto transition-all duration-300 ${
-        sidebarState === 'expanded' ? 'md:w-1/3 mx-1' : 'md:w-1/4 mx-2'
-      }`}>
+      <div
+        className={`hidden md:block overflow-y-auto transition-all duration-300 ${
+          sidebarState === "expanded" ? "md:w-1/3 mx-1" : "md:w-1/4 mx-2"
+        }`}
+      >
         <button
           onClick={createNew}
           className="border w-full flex items-center p-2 gap-4 cursor-pointer hover:bg-gray-50 rounded-4xl"
@@ -122,51 +134,62 @@ export default function EditingPage() {
                   {_.truncate(n.content, { length: 50, omission: "..." })}
                 </Markdown>
               </div>
+              <div>
+                <p>{formatDate(n.modifiedAt)}</p>
+              </div>
             </li>
           ))}
         </ul>
       </div>
 
       {/* Editor Area */}
-      <div className={`flex-1 overflow-hidden transition-all duration-300 ${
-        sidebarState === 'expanded' ? 'md:w-2/3' : 'md:w-3/4'
-      }`}>
-        <div className="p-2">
+      <div
+        className={`flex-1 overflow-hidden transition-all duration-300 ${
+          sidebarState === "expanded" ? "md:w-2/3" : "md:w-3/4"
+        }`}
+      >
+        <div className="px-2">
           <div className="flex w-full justify-center">
-            <div className={`flex justify-between w-full transition-all duration-300 ${
-              sidebarState === "collapsed" 
-                ? "md:min-w-[940px]" 
-                : "md:min-w-[748px]"
-            }`}>
+            <div
+              className={`mb-2 flex justify-between w-full transition-all duration-300 ${
+                sidebarState === "collapsed"
+                  ? "md:min-w-[940px]"
+                  : "md:min-w-[748px]"
+              }`}
+            >
               <div className="flex-1">
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => handleTitleChange(e.target.value)}
                   placeholder="Note title"
-                  className="w-full py-2 focus:outline-none text-xl"
+                  className="w-1/2 pb-2 focus:outline-none text-xl"
                 />
-                <hr />
+                <hr className="my-1 w-1/2" />
               </div>
-              <Button 
-                className={`ml-4 border p-2 cursor-pointer ${
-                  isSaving ? 'bg-green-500 border-green-500' : "border-amber-500"
-                }`} 
+              <Button
+                className={`mr-2 border pb-2 cursor-pointer ${
+                  isSaving
+                    ? "bg-green-500 border-green-500"
+                    : "border-amber-500"
+                }`}
                 onClick={handleSave}
                 variant={"secondary"}
               >
-                {isSaving ? 'Saved!' : 'Save'}
+                {isSaving ? "Saved!" : "Save"}
               </Button>
             </div>
           </div>
-          <div className={`mx-auto transition-all duration-300 mt-1 ${
-            sidebarState === "collapsed" 
-              ? "md:min-w-[960px]" 
-              : "md:min-w-[748px]"
-          }`}>
+          <div
+            className={`mx-auto transition-all duration-300 ${
+              sidebarState === "collapsed"
+                ? "md:min-w-[960px]"
+                : "md:min-w-[748px]"
+            }`}
+          >
             {note ? (
-              <Editor 
-                content={note.content} 
+              <Editor
+                content={note.content}
                 contentRef={contentRef}
                 hasUnsavedChanges={hasUnsavedChanges}
                 onContentChange={updateNote}

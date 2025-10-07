@@ -11,6 +11,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -29,7 +30,7 @@ const items = [
   },
   {
     title: "Tasks",
-    url: "#",
+    url: "/tasks",
     icon: Target,
   },
   {
@@ -45,7 +46,8 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
-        <SidebarHeader>
+        <SidebarTrigger className="absolute right-0 hidden md:block" />
+        <SidebarHeader className="hidden md:block">
           Logo
         </SidebarHeader>
         <SidebarGroup>
