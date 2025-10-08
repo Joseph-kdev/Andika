@@ -19,6 +19,12 @@ export default function NotesList({ notes }: { notes: Note[] }) {
     const router = useRouter()
     const { state: sidebarState } = useSidebar();
     const deleteNote = useNoteStore((state) => state.removeNote)
+    const tags = useNoteStore(state => state.tags)
+
+    const getTagColor = (tagName: string) => {
+      const tag = tags.find(t => t.name === tagName)
+      return tag?.color || 'transparent'
+    }
     
     const handleDelete = (id: string) => {
       deleteNote(id)
@@ -28,12 +34,17 @@ export default function NotesList({ notes }: { notes: Note[] }) {
     <div className={`grid gap-4 sm:grid-cols-2 ${sidebarState === "expanded" ? 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'}`}>
       {notes.map((note) => {
         const rotation = _.random(-2, 2, true);
+        const tagColor = getTagColor(note.tag)
         return (
           <motion.div 
             key={note.id} 
             className="relative shadow-xl rounded-lg p-2 h-[250px]"
             initial={{ rotate: rotation}}
             whileHover={{ rotate: 0, scale: 1.05, boxShadow: '0px 8px 16px rgba(0,0,0,0.4)'}}
+            style={{
+              backgroundColor: tagColor,
+              opacity: 0.9
+            }}
           >
             <div className="flex justify-between items-center">
               <p className="text-xs border px-2 py-1 rounded-lg">{note.tag}</p>

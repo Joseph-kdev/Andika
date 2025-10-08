@@ -2,16 +2,29 @@ import { create, StateCreator } from "zustand";
 import { persist, PersistOptions } from "zustand/middleware";
 import { Note } from "../../types";
 
+interface TagInfo {
+  name: string;
+  color: string;
+  emoji?: string;
+}
+
+const defaultTags: TagInfo[] = [
+  { name: "Personal", color: "#FFE4E1", emoji:'' },
+  { name: "Favorite", color: "#FFF0F5", emoji:'' },
+];
+
 interface NoteStore {
   notes: Note[];
-  tags: string[],
+  tags: TagInfo[];
   addNote: (note: Note) => void;
   removeNote: (id: string) => void;
   updateNote: (
     id: string,
     updates: Partial<Pick<Note, "title" | "content" | "tag">>
   ) => void;
-  addTag: (tag: string) => void;
+  addTag: (tag: TagInfo) => void;
+  removeTag: (tagName: string) => void;
+  updateTag:(tagName: string, updates: Partial<Pick<TagInfo, "name" | "color" | "emoji">>) => void;
 }
 
 type NoteStorePersist = (
@@ -23,7 +36,7 @@ export const useNoteStore = create<NoteStore>(
   (persist as NoteStorePersist)(
     (set) => ({
       notes: [],
-      tags: ['Personal', 'Favorite', 'Untagged'],
+      tags: defaultTags,  // Initialize with default tags
       addNote: (newNote) =>
         set((state) => ({ notes: [...state.notes, {...newNote, createdAt: new Date().toISOString(), modifiedAt: new Date().toISOString(), tag: newNote.tag || "untagged"}] })),
       removeNote: (id) =>
@@ -34,11 +47,17 @@ export const useNoteStore = create<NoteStore>(
             note.id === id ? { ...note, ...updates, modifiedAt: new Date().toISOString() } : note
           ),
         })),
-        addTag(tag) {
-          set((state) => ({
-            tags: state.tags.includes(tag) ? state.tags : [...state.tags, tag]
-          }))
-        },
+      addTag: (tag: TagInfo) =>
+        set((state) => ({
+          tags: [...state.tags, tag],
+        })),
+      removeTag: (tagName: string) =>
+        set((state) => ({
+          tags: state.tags.filter((t) => t.name !== tagName),
+        })),
+      updateTag: (tagName, updates) => set((state) => ({
+        tags: state.tags.map(tag => tag.name === tagName ? {...tag, ...updates} : tag)
+      }))
     }),
     {
       name: "notes-storage",

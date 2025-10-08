@@ -10,9 +10,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
-import { useOnClickOutside } from "usehooks-ts"
+import { useOnClickOutside } from "usehooks-ts";
 import { UserIcon } from "@/components/ui/user";
 import { HeartIcon } from "@/components/ui/heart";
+import { Circle } from "@uiw/react-color";
+import { EmojiPicker, EmojiPickerContent, EmojiPickerSearch } from "@/components/ui/emoji-picker";
 
 export default function Note() {
   const { id } = useParams<{ id: string }>();
@@ -28,8 +30,11 @@ export default function Note() {
   const [showOtherNotes, setShowOtherNotes] = useState(true);
   const contentRef = useRef(note?.content || "");
   const hasUnsavedChanges = useRef(false);
+
   const [openTagDialog, setOpenTagDialog] = useState(false);
   const [newTagName, setNewTagName] = useState("");
+  const [newTagColor, setNewTagColor] = useState("");
+  const [newTagEmoji, setNewTagEmoji] = useState("")
 
   const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,12 +55,17 @@ export default function Note() {
     hasUnsavedChanges.current = true;
   };
 
-  const handleCreateTag = () => {
+  const handleAddTag = () => {
     if (newTagName.trim()) {
-      addTag(newTagName.trim());
-      handleTagChange(newTagName.trim());
-      setOpenTagDialog(false);
+      addTag({
+        name: newTagName,
+        color: newTagColor,
+        emoji: newTagEmoji
+      });
       setNewTagName("");
+      setNewTagColor("#ffffff");
+      setNewTagEmoji('')
+      setOpenTagDialog(false);
     }
   };
 
@@ -99,6 +109,8 @@ export default function Note() {
     setSelectedTag(note?.tag || "Untagged");
   }, [note]);
 
+  console.log("tags", tags);
+
   return (
     <div
       className={`p-2 w-full md:mx-auto ${
@@ -109,20 +121,16 @@ export default function Note() {
     >
       <div className="flex w-full justify-between">
         <div className="flex items-center gap-1">
-          <p className="">
-          Notes
-          </p>
+          <p className="">Notes</p>
           <ChevronsRight className="w-6 h-6" />
-          <p>
-            {note?.title === "" ? "Unnamed" : note?.title}
-          </p>
+          <p>{note?.title === "" ? "Unnamed" : note?.title}</p>
         </div>
         <Button
           variant="outline"
           onClick={() => setShowOtherNotes(!showOtherNotes)}
           className="hidden md:block shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
         >
-          {showOtherNotes ? (
+          {showOtherNotes && notes.length > 1 ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
             <ChevronDown className="w-5 h-5" />
@@ -142,7 +150,7 @@ export default function Note() {
           dragMomentum={true}
           className="flex gap-4"
         >
-          {showOtherNotes &&
+          {showOtherNotes && notes.length > 1 &&
             notes.map((n) => (
               <div
                 key={n.id}
@@ -188,22 +196,27 @@ export default function Note() {
         </div>
 
         <div className="mt-1 flex gap-2 overflow-auto py-2 md:max-w-5xl mx-auto mb-1">
-          {tags.map((tag) => (
+          {tags.map((tag, index) => (
             <Button
-              key={tag}
-              variant={selectedTag === tag ? "default" : "outline"}
-              onClick={() => handleTagChange(tag)}
-              className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
+              key={index}
+              variant={selectedTag === tag.name ? "default" : "outline"}
+              onClick={() => handleTagChange(tag.name)}
+              className={`shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1 hover:${tag.color}`}
             >
-            {tag === "Personal" ? (
-              <UserIcon />
-            ) : tag === "Favorite" ? (
-              <HeartIcon />
-            ) : null}
-              {tag}
+              {tag.name === "Personal" ? (
+                <UserIcon />
+              ) : tag.name === "Favorite" ? (
+                <HeartIcon />
+              ) : null}
+              {tag.emoji}{"  "}
+              {tag.name}
             </Button>
           ))}
-          <Button variant={"outline"} onClick={() => setOpenTagDialog(true)} className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1">
+          <Button
+            variant={"outline"}
+            onClick={() => setOpenTagDialog(true)}
+            className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
+          >
             <Plus />
             New Tag
           </Button>
@@ -216,16 +229,50 @@ export default function Note() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-[rgba(0,0,0,0.7)] flex justify-center items-center z-50"
           >
-            <div className="bg-white min-w-sm p-4 rounded-lg relative" ref={ref}>
+            <div
+              className="bg-white min-w-sm p-4 rounded-lg relative"
+              ref={ref}
+            >
               <X className="w-4 h-4 absolute top-2 right-4" />
               <h2 className="text-center text-lg mb-4">Create New Tag</h2>
-              <div className="flex gap-4 mb-4">
+              <div className="flex flex-col gap-4 mb-4">
                 <Input
                   placeholder="Enter tag name"
                   value={newTagName}
                   onChange={(e) => setNewTagName(e.target.value)}
                 />
-                <Button onClick={handleCreateTag}>Create</Button>
+                <p>Pick a color for your tag:</p>
+                <Circle
+                  colors={[
+                    "#f44336",
+                    "#e91e63",
+                    "#9c27b0",
+                    "#673ab7",
+                    "#3f51b5",
+                    "#2196f3",
+                    "#F44E3B",
+                    "#FE9200",
+                    "#FCDC00",
+                    "#DBDF00",
+                  ]}
+                  color={newTagColor}
+                  onChange={(color) => setNewTagColor(color.hex)}
+                />
+                <p>
+                  An emoji for your tag: {newTagEmoji ? newTagEmoji : ''}
+                </p>
+                <EmojiPicker
+                  className="h-[156px] w-full rounded-lg border shadow-md"
+                  onEmojiSelect={({ emoji }) => {
+                    setNewTagEmoji(emoji)
+                  }}
+                >
+                  <EmojiPickerSearch />
+                  <EmojiPickerContent className="w-full active:bg-accent" />
+                </EmojiPicker>
+              </div>
+              <div className="w-full flex justify-center">
+                <Button onClick={handleAddTag}>Create</Button>
               </div>
             </div>
           </motion.div>

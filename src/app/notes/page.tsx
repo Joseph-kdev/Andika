@@ -1,7 +1,9 @@
 "use client";
 import NotesList from "@/components/NotesList";
+import TagManager from "@/components/TagManager";
 import { BoxesIcon } from "@/components/ui/boxes";
 import { Button } from "@/components/ui/button";
+import { GripIcon } from "@/components/ui/grip";
 import { HeartIcon } from "@/components/ui/heart";
 import { PlusIcon } from "@/components/ui/plus";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -17,6 +19,7 @@ export default function Notes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTag, SetSelectedTag] = useState("all");
   const router = useRouter();
+  const [openTagManage, setOpenTagManage] = useState(false);
 
   const notes = useNoteStore((state) => state.notes);
   const addNote = useNoteStore((state) => state.addNote);
@@ -24,10 +27,10 @@ export default function Notes() {
 
   const debouncedSearch = useCallback(
     debounce((value: string) => {
-      setSearchTerm(value)
+      setSearchTerm(value);
     }, 300),
     []
-  )
+  );
 
   const createNew = () => {
     const noteId = uuid4();
@@ -51,8 +54,8 @@ export default function Notes() {
     return matchesSearch && note.tag === selectedTag;
   });
 
-  const handleTagSelect = (tag: string) => {
-    SetSelectedTag(tag);
+  const handleTagSelect = (tagName: string) => {
+    SetSelectedTag(tagName);
   };
 
   return (
@@ -73,34 +76,59 @@ export default function Notes() {
         />
       </div>
 
-      <div className="mt-2 flex gap-2 overflow-auto py-2 mb-4">
-        <Button variant={selectedTag === "all" ? "default" : "outline"} onClick={() => handleTagSelect("all")} className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1">
-          <BoxesIcon />
-          All
-        </Button>
-        {tags.map((tag) => (
+      <div className="flex md:justify-between items-center">
+        <div className="mt-2 flex gap-2 overflow-auto py-2 mb-4">
           <Button
-            key={tag}
-            variant={selectedTag === tag ? "default" : "outline"}
-            onClick={() => handleTagSelect(tag)}
+            variant={selectedTag === "all" ? "default" : "outline"}
+            onClick={() => handleTagSelect("all")}
             className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
           >
-            {tag === "Personal" ? (
-              <UserIcon />
-            ) : tag === "Favorite" ? (
-              <HeartIcon />
-            ) : null}
-            {tag}
+            <BoxesIcon />
+            All
           </Button>
-        ))}
+          {tags.map((tag, index) => (
+            <Button
+              key={index}
+              variant={selectedTag === tag.name ? "default" : "outline"}
+              onClick={() => handleTagSelect(tag.name)}
+              className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
+            >
+              {tag.name === "Personal" ? (
+                <UserIcon />
+              ) : tag.name === "Favorite" ? (
+                <HeartIcon />
+              ) : null}
+              {tag.emoji}
+              {"  "}
+              {tag.name}
+            </Button>
+          ))}
+          <Button
+            className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1 md:hidden"
+            variant={openTagManage ? "default" : "outline"}
+            onClick={() => setOpenTagManage(true)}
+          >
+            <GripIcon />
+            Manage Tags
+          </Button>
+        </div>
+        <Button
+          className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1 hidden md:flex mb-2"
+          variant={openTagManage ? "default" : "outline"}
+          onClick={() => setOpenTagManage(true)}
+        >
+          <GripIcon />
+          Manage Tags
+        </Button>
       </div>
+
       <div
         className="rounded-full bg-accent-foreground absolute bottom-10 right-4 cursor-pointer z-40"
         onClick={createNew}
       >
         <PlusIcon size={48} className="text-white p-2" />
       </div>
-
+      {openTagManage && <TagManager setOpenTagManage={setOpenTagManage} />}
       <NotesList notes={filteredNotes} />
     </div>
   );
