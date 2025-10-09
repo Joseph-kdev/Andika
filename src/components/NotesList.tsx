@@ -43,16 +43,15 @@ export default function NotesList({ notes }: { notes: Note[] }) {
             whileHover={{ rotate: 0, scale: 1.05, boxShadow: '0px 8px 16px rgba(0,0,0,0.4)'}}
             style={{
               backgroundColor: tagColor,
-              opacity: 0.9
             }}
           >
             <div className="flex justify-between items-center">
-              <p className="text-xs border px-2 py-1 rounded-lg">{note.tag}</p>
+              <p className="text-[8px] border-background px-2 py-1 rounded-lg">{note.tag}</p>
               <Ellipsis className="w-4 h-4 cursor-pointer" />
             </div>
-            <div className="mb-4 cursor-pointer" onClick={() => router.push(`notes/${note.id}`)}>
-              <h2 className="text-lg my-1">{note.title}</h2>
-              <div className="text-grey-400 mb-4">
+            <div className="mb-4 cursor-pointer mt-2" onClick={() => router.push(`notes/${note.id}`)}>
+              <h2 className="text-lg my-1 font-semibold">{note.title}</h2>
+              <div className="mb-4">
                   <Markdown
                   remarkPlugins={[remarkGfm, remarkBreaks]}
                   rehypePlugins={[rehypeRaw, rehypeSanitize]}
@@ -62,7 +61,7 @@ export default function NotesList({ notes }: { notes: Note[] }) {
               </div>
             </div>
               <DeleteIcon size={20} className="absolute bottom-4" onClick={() => handleDelete(note.id)}/>
-              <p className="absolute bottom-4 right-2">
+              <p className="absolute bottom-4 right-2 opacity-70">
                   {formatDate(note.modifiedAt)}
               </p>
           </motion.div>

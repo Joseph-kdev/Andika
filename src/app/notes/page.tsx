@@ -123,7 +123,7 @@ export default function Notes() {
       </div>
 
       <div
-        className="rounded-full bg-accent-foreground absolute bottom-10 right-4 cursor-pointer z-40"
+        className="rounded-full bg-accent-foreground absolute bottom-10 right-4 cursor-pointer z-40 shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
         onClick={createNew}
       >
         <PlusIcon size={48} className="text-white p-2" />

@@ -65,6 +65,12 @@
 }
 
 :root {
+  --text: #ededed;
+  --background: #203a43;
+  --primary: #9ad8ed;
+  --secondary: #422029;
+  --accent: #7cdeff;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.13 0.028 261.692);
