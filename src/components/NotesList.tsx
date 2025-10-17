@@ -1,6 +1,6 @@
 'use client'
 import React from "react";
-import { Note } from "../../types";
+import { Note } from "../types";
 import { Ellipsis } from "lucide-react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";

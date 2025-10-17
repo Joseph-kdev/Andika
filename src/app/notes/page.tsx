@@ -81,7 +81,10 @@ export default function Notes() {
           <Button
             variant={selectedTag === "all" ? "default" : "outline"}
             onClick={() => handleTagSelect("all")}
-            className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
+            className={`${selectedTag == "all"
+              ? "shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
+              : "shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
+          }`}
           >
             <BoxesIcon />
             All
@@ -91,7 +94,10 @@ export default function Notes() {
               key={index}
               variant={selectedTag === tag.name ? "default" : "outline"}
               onClick={() => handleTagSelect(tag.name)}
-              className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
+              className={`${selectedTag == tag.name
+              ? "shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
+              : "shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
+          }`}
             >
               {tag.name === "Personal" ? (
                 <UserIcon />

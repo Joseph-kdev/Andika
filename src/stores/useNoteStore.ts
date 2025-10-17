@@ -1,6 +1,6 @@
 import { create, StateCreator } from "zustand";
 import { persist, PersistOptions } from "zustand/middleware";
-import { Note } from "../../types";
+import { Note } from "../types";
 
 interface TagInfo {
   name: string;

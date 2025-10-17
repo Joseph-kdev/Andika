@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatDate(isoDateString: string) {
+export function formatDate(isoDateString: string | Date) {
   // Create a Date object from the ISO string
   const date = new Date(isoDateString);
   

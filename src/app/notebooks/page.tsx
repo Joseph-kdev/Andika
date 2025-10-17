@@ -13,7 +13,7 @@ import rehypeSanitize from "rehype-sanitize";
 import remarkBreaks from "remark-breaks";
 import { useSidebar } from "@/components/ui/sidebar";
 import { formatDate } from "@/lib/utils";
-import { Note } from "../../../types";
+import { Note } from "../../types";
 
 export default function NoteBooks() {
   const addNote = useNoteStore((state) => state.addNote);

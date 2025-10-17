@@ -10,7 +10,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import remarkBreaks from "remark-breaks";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { Note } from "../../types";
+import { Note } from "../types";
 
 export default function PagePreview({ note }: { note: Note }) {
   const router = useRouter();
