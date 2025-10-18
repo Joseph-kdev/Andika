@@ -10,8 +10,7 @@ import TaskForm from "@/components/TaskForm";
 import { Button } from "@/components/ui/button";
 import { useTaskStore } from "@/stores/useTaskStore";
 import { Task } from "@/types";
-import { Check, Pencil, Trash2 } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import TaskListComponent from "@/components/TaskListComponent";
 
 export default function Tasks() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -204,99 +203,7 @@ export default function Tasks() {
         </motion.div>
       )}
 
-      <div className="mt-6 space-y-2">
-        {filteredTasks.length === 0 ? (
-          <p className="text-center text-gray-500">No tasks found</p>
-        ) : (
-          filteredTasks.map((task) => (
-            <div
-              key={task.id}
-              className="flex items-center gap-4 p-4 bg-background rounded-lg border shadow-sm"
-            >
-              <button
-                onClick={() => toggleTaskStatus(task.id, task.status)}
-                className={`h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors
-                  ${
-                    task.status === "completed"
-                      ? "bg-primary border-primary"
-                      : "border-muted-foreground hover:border-primary"
-                  }`}
-              >
-                {task.status === "completed" && (
-                  <Check className="h-3 w-3 text-primary-foreground" />
-                )}
-              </button>
-
-              <div className="flex-1 flex flex-col md:flex-row ">
-                <div className="">
-                  <div className="flex items-center gap-2">
-                    <h3
-                      className={`font-medium ${
-                        task.status === "completed"
-                          ? "line-through text-muted-foreground"
-                          : ""
-                      }`}
-                    >
-                      {task.title}
-                    </h3>
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-xs ${
-                        task.priority === "high"
-                          ? "bg-red-100 text-red-800"
-                          : task.priority === "medium"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {task.priority}
-                    </span>
-                  </div>
-                  <div>
-                    {task.description && (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {task.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex flex-col items-start justify-center md:hidden gap-1">
-                  <span className="text-xs text-muted-foreground">
-                    {task.createdAt
-                      ? `Created on ${formatDate(task.createdAt)}`
-                      : "No creation date found"}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {task.dueDate
-                      ? `Due by ${formatDate(task.dueDate)}`
-                      : "No due date"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex-1 hidden md:flex flex-col items-start justify-center gap-2">
-                <span className="text-xs text-muted-foreground">
-                  {task.createdAt
-                    ? `Created on ${formatDate(task.createdAt)}`
-                    : "No creation date found"}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {task.dueDate
-                    ? `Due by ${formatDate(task.dueDate)}`
-                    : "No due date"}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-muted rounded-full">
-                  <Pencil className="h-4 w-4 text-muted-foreground" />
-                </button>
-                <button className="p-2 hover:bg-muted rounded-full">
-                  <Trash2 className="h-4 w-4 text-muted-foreground" />
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      <TaskListComponent tasks={filteredTasks} />
     </div>
   );
 }

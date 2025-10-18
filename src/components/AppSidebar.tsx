@@ -1,17 +1,17 @@
 "use client"
-import { Calendar, Edit2, FileText, Home, Inbox, Search, Target } from "lucide-react";
+import { Edit2, FileText, Home,Target } from "lucide-react";
 
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -42,23 +42,24 @@ const items = [
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { state: sidebarState } = useSidebar();
 
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarTrigger className="absolute right-0 hidden md:block" />
-        <SidebarHeader className="hidden md:block">
-          Logo
+        <SidebarHeader className="">
+          Andika
         </SidebarHeader>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={pathname === item.url}>
+                  <SidebarMenuButton asChild isActive={pathname === item.url}  className="text-muted-foreground active:font-medium">
                     <Link href={item.url}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span className="font-medium">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

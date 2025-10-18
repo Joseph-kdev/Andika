@@ -49,8 +49,7 @@ export default function TaskForm({ setOpenTaskDialog }: { setOpenTaskDialog:Disp
         [field]: value
       }));
     };
-    console.log("form Data", formData)
-
+    
     const createNewTask = () => {
       if(formData.title === '') {
         throw new Error("Task cannot be blank");
