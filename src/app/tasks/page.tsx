@@ -4,7 +4,7 @@ import { PlusIcon } from "@/components/ui/plus";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { debounce } from "lodash";
 import { SearchIcon } from "lucide-react";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import TaskForm from "@/components/TaskForm";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,11 @@ export default function Tasks() {
   const { state: sidebarState } = useSidebar();
   const [filter, setFilter] = useState("all");
   const tasks = useTaskStore((state) => state.tasks);
+  const updateOverdueTasks = useTaskStore((state) => state.updateOverdueTasks);
+
+  useEffect(() => {
+    updateOverdueTasks();
+  }, [updateOverdueTasks]);
 
   const debouncedSearch = useCallback(
     debounce((value: string) => {
@@ -48,6 +53,8 @@ export default function Tasks() {
           task.dueDate &&
           new Date(task.dueDate).toDateString() === selectedDate.toDateString();
 
+          if(isDueOnDate)
+
         return (taskDate >= startOfDay && taskDate <= endOfDay) || isDueOnDate;
       });
     }
@@ -59,7 +66,7 @@ export default function Tasks() {
       case "pending":
         return filteredTasks.filter((task) => task.status === "pending");
       case "overdue":
-        return filteredTasks.filter((task) => task.status === "overdue");
+        return tasks.filter((task) => task.status === "overdue");
       default:
         return filteredTasks;
     }
@@ -74,13 +81,6 @@ export default function Tasks() {
     completed: tasks.filter((t) => t.status === "completed").length,
     pending: tasks.filter((t) => t.status === "pending").length,
     overdue: tasks.filter((t) => t.status === "overdue").length,
-  };
-
-  const toggleTaskStatus = (taskId: string, currentStatus: string) => {
-    const updateTask = useTaskStore.getState().updateTask;
-    updateTask(taskId, {
-      status: currentStatus === "completed" ? "pending" : "completed",
-    });
   };
 
   return (

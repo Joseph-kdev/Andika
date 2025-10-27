@@ -9,6 +9,7 @@ export interface TaskStore {
   addTask: (taskData: Task) => void;
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
+  updateOverdueTasks: () => void;
 }
 
 type TaskStorePersist = (
@@ -34,6 +35,26 @@ export const useTaskStore = create<TaskStore>(
 
       deleteTask: (id) => set((state) => ({
         tasks: state.tasks.filter((t) => t.id !== id)
+      })),
+
+      updateOverdueTasks: () => set((state) => ({
+        tasks: state.tasks.map((task) => {
+          if (task.status === 'pending' && task.dueDate) {
+            const dueDate = new Date(task.dueDate);
+            dueDate.setHours(0, 0, 0, 0);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            console.log(`Task: ${task.title}, Due: ${dueDate.toISOString()}, Today: ${today.toISOString()}, Is Overdue: ${dueDate < today}`);
+            if (dueDate < today) {
+              return {
+                ...task,
+                status: 'overdue' as const,
+                updatedAt: new Date(),
+              };
+            }
+          }
+          return task;
+        })
       })),
     }),
     {

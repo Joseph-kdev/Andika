@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 import { Dispatch, SetStateAction, useState } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
-import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "./ui/field";
+import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "./ui/field";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "./ui/select";
 import { SelectItem } from "@radix-ui/react-select";
@@ -34,6 +34,7 @@ function TaskDeleteDialog({
       return
     }
     deleteTask(task?.id)
+    setOpenDeleteDialog(false)
   }
 
   return (
@@ -50,7 +51,7 @@ function TaskDeleteDialog({
         Are you sure you want to delete the task:
       </h4>
       <p className="text-sm text-muted-foreground mt-1 text-center">
-        "{task?.title}" created on {formatDate(task?.createdAt as Date)}
+        &quot;{task?.title}&quot; created on {formatDate(task?.createdAt as Date)}
       </p>
       <div className="flex-1 mt-4 flex justify-center gap-3">
         <Button
@@ -175,7 +176,7 @@ function TaskEditDialog({
                 <Button className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1" onClick={confirmTaskUpdate}>
                     Save
                 </Button>
-                <Button variant={"outline"} className="shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1">
+                <Button variant={"outline"} className="shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1" onClick={() => setOpenEditDialog(false)}>
                   Cancel
                 </Button>
               </Field>
