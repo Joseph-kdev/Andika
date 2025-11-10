@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Note } from "../types";
-import { Ellipsis, X } from "lucide-react";
+import { PinIcon, PinOffIcon, X } from "lucide-react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -23,7 +23,8 @@ export default function NotesList({ notes }: { notes: Note[] }) {
   const deleteNote = useNoteStore((state) => state.removeNote);
   const tags = useNoteStore((state) => state.tags);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null)
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const togglePinNote = useNoteStore((state) => state.togglePinNote);
 
   const getTagColor = (tagName: string) => {
     const tag = tags.find((t) => t.name === tagName);
@@ -31,14 +32,14 @@ export default function NotesList({ notes }: { notes: Note[] }) {
   };
 
   const handleDeleteDialog = (note: Note) => {
-    console.log("selected note", note)
-    setSelectedNote(note)
+    console.log("selected note", note);
+    setSelectedNote(note);
     setOpenDeleteDialog(true);
   };
 
   const handleDelete = (id: string) => {
-    deleteNote(id)
-  }
+    deleteNote(id);
+  };
 
   return (
     <div
@@ -66,10 +67,19 @@ export default function NotesList({ notes }: { notes: Note[] }) {
             }}
           >
             <div className="flex justify-between items-center">
-              <p className="text-[8px] border-background px-2 py-1 rounded-lg">
+              <p className="text-[8px] border-accent border-1 px-2 py-1 rounded-lg">
                 {note.tag}
               </p>
-              <Ellipsis className="w-4 h-4 cursor-pointer" />
+              <button
+                onClick={() => togglePinNote(note.id)}
+                className="p-1 hover:bg-muted rounded-full"
+              >
+                {note.isPinned ? (
+                  <PinOffIcon className="h-4 w-4 text-primary" />
+                ) : (
+                  <PinIcon className="h-4 w-4 text-foreground" />
+                )}
+              </button>
             </div>
             <div
               className="mb-4 cursor-pointer mt-2"
@@ -143,7 +153,11 @@ export default function NotesList({ notes }: { notes: Note[] }) {
               className="border bg-background rounded-md hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 absolute top-4 right-5 cursor-pointer shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1 p-1"
               onClick={() => setOpenDeleteDialog(false)}
             >
-              <X width={12} height={12} onClick={() => setOpenDeleteDialog(false)} />
+              <X
+                width={12}
+                height={12}
+                onClick={() => setOpenDeleteDialog(false)}
+              />
             </div>
           </div>
         </motion.div>

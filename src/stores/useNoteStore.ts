@@ -25,6 +25,7 @@ interface NoteStore {
   addTag: (tag: TagInfo) => void;
   removeTag: (tagName: string) => void;
   updateTag:(tagName: string, updates: Partial<Pick<TagInfo, "name" | "color" | "emoji">>) => void;
+  togglePinNote: (noteId: string) => void
 }
 
 type NoteStorePersist = (
@@ -38,7 +39,7 @@ export const useNoteStore = create<NoteStore>(
       notes: [],
       tags: defaultTags,  // Initialize with default tags
       addNote: (newNote) =>
-        set((state) => ({ notes: [...state.notes, {...newNote, createdAt: new Date().toISOString(), modifiedAt: new Date().toISOString(), tag: newNote.tag || "untagged"}] })),
+        set((state) => ({ notes: [...state.notes, {...newNote, createdAt: new Date().toISOString(), modifiedAt: new Date().toISOString(), tag: newNote.tag || "untagged", isPinned: false}] })),
       removeNote: (id) =>
         set((state) => ({ notes: state.notes.filter((n) => n.id !== id) })),
       updateNote: (id, updates) =>
@@ -57,6 +58,9 @@ export const useNoteStore = create<NoteStore>(
         })),
       updateTag: (tagName, updates) => set((state) => ({
         tags: state.tags.map(tag => tag.name === tagName ? {...tag, ...updates} : tag)
+      })),
+      togglePinNote: (noteId) => set((state) => ({
+        notes: state.notes.map(note => note.id === noteId ? {...note, isPinned: !note.isPinned} : note)
       }))
     }),
     {

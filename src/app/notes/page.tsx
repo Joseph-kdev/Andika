@@ -8,9 +8,10 @@ import { HeartIcon } from "@/components/ui/heart";
 import { PlusIcon } from "@/components/ui/plus";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { UserIcon } from "@/components/ui/user";
+import { useAnalytics } from "@/hooks/use-analytics";
 import { useNoteStore } from "@/stores/useNoteStore";
 import { debounce } from "lodash";
-import { SearchIcon } from "lucide-react";
+import { Flame, SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useState } from "react";
 import { v4 as uuid4 } from "uuid";
@@ -20,6 +21,7 @@ export default function Notes() {
   const [selectedTag, SetSelectedTag] = useState("all");
   const router = useRouter();
   const [openTagManage, setOpenTagManage] = useState(false);
+  const analytics = useAnalytics();
 
   const notes = useNoteStore((state) => state.notes);
   const addNote = useNoteStore((state) => state.addNote);
@@ -61,6 +63,16 @@ export default function Notes() {
   return (
     <div className="px-2 w-full min-h-screen relative">
       <SidebarTrigger className="md:hidden absolute right-0" />
+      <div className="absolute p-2 rounded-full flex justify-center items-center right-4 top-2">
+        <Flame
+          className="w-5 h-5"
+          fill={analytics.streak.days > 0 ? "#ff9a00" : "none"}
+          stroke={analytics.streak.days > 0 ? "#ff5900c0" : "black"}
+        />
+        <p className="">
+          {analytics.streak.days}
+        </p>
+      </div>
       <div>
         <h2 className="text-2xl">Notes</h2>
         <p className="text-gray-600">Jot your thoughts down.</p>
@@ -81,10 +93,11 @@ export default function Notes() {
           <Button
             variant={selectedTag === "all" ? "default" : "outline"}
             onClick={() => handleTagSelect("all")}
-            className={`${selectedTag == "all"
-              ? "shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
-              : "shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
-          }`}
+            className={`${
+              selectedTag == "all"
+                ? "shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
+                : "shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
+            }`}
           >
             <BoxesIcon />
             All
@@ -94,10 +107,11 @@ export default function Notes() {
               key={index}
               variant={selectedTag === tag.name ? "default" : "outline"}
               onClick={() => handleTagSelect(tag.name)}
-              className={`${selectedTag == tag.name
-              ? "shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
-              : "shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
-          }`}
+              className={`${
+                selectedTag == tag.name
+                  ? "shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
+                  : "shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
+              }`}
             >
               {tag.name === "Personal" ? (
                 <UserIcon />

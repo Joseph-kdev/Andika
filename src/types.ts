@@ -5,6 +5,7 @@ export interface Note {
   createdAt: string;
   modifiedAt: string;
   tag: string;
+  isPinned?: boolean;
 }
 
 export type Priority = "low" | "medium" | "high"

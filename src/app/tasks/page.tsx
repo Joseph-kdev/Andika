@@ -3,7 +3,7 @@ import { DatePicker } from "@/components/DatePicker";
 import { PlusIcon } from "@/components/ui/plus";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { debounce } from "lodash";
-import { SearchIcon } from "lucide-react";
+import { Flame, SearchIcon } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import TaskForm from "@/components/TaskForm";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useTaskStore } from "@/stores/useTaskStore";
 import { Task } from "@/types";
 import TaskListComponent from "@/components/TaskListComponent";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 export default function Tasks() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,6 +21,7 @@ export default function Tasks() {
   const [filter, setFilter] = useState("all");
   const tasks = useTaskStore((state) => state.tasks);
   const updateOverdueTasks = useTaskStore((state) => state.updateOverdueTasks);
+  const analytics = useAnalytics()
 
   useEffect(() => {
     updateOverdueTasks();
@@ -86,9 +88,19 @@ export default function Tasks() {
   return (
     <div className="px-2 w-full min-h-screen relative">
       <SidebarTrigger className="md:hidden absolute right-0" />
+            <div className="absolute p-2 rounded-full flex justify-center items-center right-4 top-2">
+        <Flame
+          className="w-5 h-5"
+          fill={analytics.streak.days > 0 ? "#ff9a00" : "none"}
+          stroke={analytics.streak.days > 0 ? "#ff5900c0" : "black"}
+        />
+        <p className="">
+          {analytics.streak.days}
+        </p>
+      </div>
       <div>
         <h2 className="text-2xl">Tasks</h2>
-        <p className="text-gray-600">Just do it.</p>
+        <p className="text-gray-600">Lock In.</p>
       </div>
       <div className="w-full md:max-w-md relative mt-4">
         <SearchIcon height={16} width={16} className="absolute top-2 left-0" />
