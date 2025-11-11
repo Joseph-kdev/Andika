@@ -61,9 +61,9 @@ export default function Notes() {
   };
 
   return (
-    <div className="px-2 w-full min-h-screen relative">
-      <SidebarTrigger className="md:hidden absolute right-0" />
-      <div className="absolute p-2 rounded-full flex justify-center items-center right-4 top-2">
+    <div className="px-4 w-full min-h-screen relative border my-2 shadow-2xl rounded-md py-2">
+      <div className="absolute right-2 top-2 flex items-center">
+      <div className="p-2 rounded-full flex justify-center items-center">
         <Flame
           className="w-5 h-5"
           fill={analytics.streak.days > 0 ? "#ff9a00" : "none"}
@@ -72,6 +72,8 @@ export default function Notes() {
         <p className="">
           {analytics.streak.days}
         </p>
+      </div>
+      <SidebarTrigger className="md:hidden" />
       </div>
       <div>
         <h2 className="text-2xl">Notes</h2>

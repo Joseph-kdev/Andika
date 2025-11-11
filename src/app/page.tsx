@@ -96,13 +96,13 @@ export default function Dashboard() {
 
   return (
     <div
-      className={`p-2 ${
+      className={`px-4 border my-2 shadow-2xl rounded-md py-2 ${
         sidebarState === "collapsed"
           ? "md:w-[calc(100vw-4rem)]"
-          : "md:w-[calc(100vw-16rem)]"
+          : "md:w-[calc(100vw-15rem)]"
       }`}
     >
-      <SidebarTrigger className="md:hidden absolute right-0" />
+      <SidebarTrigger className="md:hidden absolute right-2" />
       <div className="flex justify-between items-center mb-2">
         <h1 className="text-xl font-semibold">Welcome back</h1>
       </div>

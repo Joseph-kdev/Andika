@@ -1,5 +1,5 @@
-"use client"
-import { Edit2, FileText, Home,Target } from "lucide-react";
+"use client";
+import { Book, FileText, Home, Target } from "lucide-react";
 
 import {
   Sidebar,
@@ -34,29 +34,42 @@ const items = [
     icon: Target,
   },
   {
-    title: "Journal",
+    title: "Notebooks",
     url: "#",
-    icon: Edit2,
+    icon: Book,
   },
 ];
 
 export function AppSidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
   const { state: sidebarState } = useSidebar();
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarContent>
-        <SidebarTrigger className="absolute right-0 hidden md:block" />
-        <SidebarHeader className="">
-          Andika
-        </SidebarHeader>
+    <Sidebar collapsible="icon" variant="floating">
+      <SidebarContent
+        className={`shadow-2xl ${
+          sidebarState === "collapsed" ? "flex items-center" : ""
+        }`}
+      >
+          {sidebarState === "collapsed" ? (
+            <SidebarTrigger className="hidden md:flex" />
+          ) : (
+            <div>
+              <SidebarHeader className="hidden md:block">Andika</SidebarHeader>
+              <SidebarTrigger className="absolute right-2 top-4 hidden md:flex" />
+            </div>
+          )}
+        <SidebarHeader className="md:hidden">Andika</SidebarHeader>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={pathname === item.url}  className="text-muted-foreground active:font-medium">
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.url}
+                    className="text-muted-foreground active:font-medium"
+                  >
                     <Link href={item.url}>
                       <item.icon />
                       <span className="font-medium">{item.title}</span>
