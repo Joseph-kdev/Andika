@@ -179,43 +179,45 @@ export default function Dashboard() {
               }`}
             >
               <div className="absolute inset-0 bg-white/90 z-20"></div>
-              <Image
-                className="h-[268px] min-w-sm"
-                width={260}
-                height={100}
-                src={
-                  "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHExcnE1dGUzcWs1eGp2MWRlcWppaWZvMG8zbzV2Z3cyYXlwb2c5NyZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/iqatr9kJTDezD9YLpZ/giphy.gif"
-                }
-                alt="sticking notes"
-              />
-              <Image
-                className="h-[268px] min-w-sm"
-                width={260}
-                height={100}
-                src={
-                  "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHExcnE1dGUzcWs1eGp2MWRlcWppaWZvMG8zbzV2Z3cyYXlwb2c5NyZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/iqatr9kJTDezD9YLpZ/giphy.gif"
-                }
-                alt="sticking notes"
-              />
-              <Image
-                className="h-[268px] min-w-sm"
-                width={260}
-                height={100}
-                src={
-                  "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHExcnE1dGUzcWs1eGp2MWRlcWppaWZvMG8zbzV2Z3cyYXlwb2c5NyZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/iqatr9kJTDezD9YLpZ/giphy.gif"
-                }
-                alt="sticking notes"
-              />
-              <div className="absolute inset-0 flex flex-col justify-center items-center gap-2 z-50">
-                <h3>No pinned notes so far</h3>
-                <Button
-                  variant={"outline"}
-                  className="mt-1 w-20 shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
-                  onClick={() => router.push("/notes")}
-                >
-                  Get started
-                </Button>
+              <div className="w-full flex justify-center">
+                <div className="absolute inset-0 flex flex-col justify-center items-center gap-2 z-50">
+                  <h3>No pinned notes so far</h3>
+                  <Button
+                    variant={"outline"}
+                    className="mt-1 w-20 shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
+                    onClick={() => router.push("/notes")}
+                  >
+                    Get started
+                  </Button>
+                </div>
               </div>
+              <Image
+                className="h-[268px] min-w-sm"
+                width={260}
+                height={100}
+                src={
+                  "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHExcnE1dGUzcWs1eGp2MWRlcWppaWZvMG8zbzV2Z3cyYXlwb2c5NyZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/iqatr9kJTDezD9YLpZ/giphy.gif"
+                }
+                alt="sticking notes"
+              />
+              <Image
+                className="h-[268px] min-w-sm"
+                width={260}
+                height={100}
+                src={
+                  "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHExcnE1dGUzcWs1eGp2MWRlcWppaWZvMG8zbzV2Z3cyYXlwb2c5NyZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/iqatr9kJTDezD9YLpZ/giphy.gif"
+                }
+                alt="sticking notes"
+              />
+              <Image
+                className="h-[268px] min-w-sm"
+                width={260}
+                height={100}
+                src={
+                  "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dHExcnE1dGUzcWs1eGp2MWRlcWppaWZvMG8zbzV2Z3cyYXlwb2c5NyZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/iqatr9kJTDezD9YLpZ/giphy.gif"
+                }
+                alt="sticking notes"
+              />
             </div>
           ) : (
             <div>
@@ -384,7 +386,33 @@ export default function Dashboard() {
                   : "md:w-[calc(100vw-36rem)]"
               }`}
             >
-              
+              <div className="w-full flex justify-center bg-[#f8f9fe]">
+                <div className="relative text-center">
+                  <div className="flex justify-center">
+                    <p className="absolute top-10">
+                      Seems you haven&apos;t created any
+                    </p>
+                  </div>
+                  <Image
+                    className=""
+                    width={260}
+                    height={100}
+                    src={
+                      "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYXpzOTBqMXN4aGMydTFva3hsajd2ZmtmZmZzdDBoZWx1cDF3d29tbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6wZpP5PLB9WEpwaqiW/giphy.gif"
+                    }
+                    alt="recent notes"
+                  />
+                  <div className="w-full flex justify-center">
+                    <Button
+                      variant={"outline"}
+                      className="mt-1 w-20 shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1 absolute bottom-8"
+                      onClick={() => router.push("/notes")}
+                    >
+                      Create
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <div>

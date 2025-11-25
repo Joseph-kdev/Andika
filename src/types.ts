@@ -8,10 +8,18 @@ export interface Note {
   isPinned?: boolean;
 }
 
-export type Priority = "low" | "medium" | "high"
+export interface NoteBook {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  modifiedAt: string;
+  color: string;
+}
 
-export type TaskStatus = "pending" | "completed" | "overdue"
+export type Priority = "low" | "medium" | "high";
 
+export type TaskStatus = "pending" | "completed" | "overdue";
 
 export interface Task {
   id: string;
@@ -21,7 +29,7 @@ export interface Task {
   priority: Priority;
   status: TaskStatus;
   createdAt: Date;
-  updatedAt: Date
+  updatedAt: Date;
 }
 
 export interface TaskStats {
@@ -32,16 +40,16 @@ export interface TaskStats {
 }
 
 export interface CreateTaskInput {
-  title: string
-  description: string
-  dueDate: string
-  priority: Priority
+  title: string;
+  description: string;
+  dueDate: string;
+  priority: Priority;
 }
 
 export interface UpdateTaskInput {
-  title?: string
-  description?: string
-  dueDate?: Date | null
-  priority?: Priority
-  status?: TaskStatus
+  title?: string;
+  description?: string;
+  dueDate?: Date | null;
+  priority?: Priority;
+  status?: TaskStatus;
 }

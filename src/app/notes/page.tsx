@@ -12,6 +12,7 @@ import { useAnalytics } from "@/hooks/use-analytics";
 import { useNoteStore } from "@/stores/useNoteStore";
 import { debounce } from "lodash";
 import { Flame, SearchIcon } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useState } from "react";
 import { v4 as uuid4 } from "uuid";
@@ -63,17 +64,15 @@ export default function Notes() {
   return (
     <div className="px-4 w-full min-h-screen relative border my-2 shadow-2xl rounded-md py-2">
       <div className="absolute right-2 top-2 flex items-center">
-      <div className="p-2 rounded-full flex justify-center items-center">
-        <Flame
-          className="w-5 h-5"
-          fill={analytics.streak.days > 0 ? "#ff9a00" : "none"}
-          stroke={analytics.streak.days > 0 ? "#ff5900c0" : "black"}
-        />
-        <p className="">
-          {analytics.streak.days}
-        </p>
-      </div>
-      <SidebarTrigger className="md:hidden" />
+        <div className="p-2 rounded-full flex justify-center items-center">
+          <Flame
+            className="w-5 h-5"
+            fill={analytics.streak.days > 0 ? "#ff9a00" : "none"}
+            stroke={analytics.streak.days > 0 ? "#ff5900c0" : "black"}
+          />
+          <p className="">{analytics.streak.days}</p>
+        </div>
+        <SidebarTrigger className="md:hidden" />
       </div>
       <div>
         <h2 className="text-2xl">Notes</h2>
@@ -151,7 +150,24 @@ export default function Notes() {
         <PlusIcon size={48} className="text-white p-2" />
       </div>
       {openTagManage && <TagManager setOpenTagManage={setOpenTagManage} />}
-      <NotesList notes={filteredNotes} />
+      {filteredNotes.length == 0 ? (
+        <div className="w-full flex flex-col items-center justify-center mt-10">
+          <Image
+            className=""
+            width={260}
+            height={100}
+            src={
+              "/blank.svg"
+            }
+            alt="No notes"
+          />
+          <p className="mt-4">
+            No notes found. Click on the plus button to add one.
+          </p>
+        </div>
+      ) : (
+        <NotesList notes={filteredNotes} />
+      )}
     </div>
   );
 }

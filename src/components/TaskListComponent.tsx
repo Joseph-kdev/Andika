@@ -8,7 +8,13 @@ import { Button } from "./ui/button";
 import { Dispatch, SetStateAction, useState } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
-import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "./ui/field";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "./ui/field";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "./ui/select";
 import { SelectItem } from "@radix-ui/react-select";
@@ -16,7 +22,7 @@ import { Textarea } from "./ui/textarea";
 
 interface FormData {
   title: string;
-  priority: Priority | '';
+  priority: Priority | "";
   dueDate: string;
   description: string;
 }
@@ -28,14 +34,14 @@ function TaskDeleteDialog({
   task: Task | null;
   setOpenDeleteDialog: Dispatch<SetStateAction<boolean>>;
 }) {
-  const deleteTask =  useTaskStore((state) => state.deleteTask)
+  const deleteTask = useTaskStore((state) => state.deleteTask);
   const handleDelete = () => {
-    if(!task) {
-      return
+    if (!task) {
+      return;
     }
-    deleteTask(task?.id)
-    setOpenDeleteDialog(false)
-  }
+    deleteTask(task?.id);
+    setOpenDeleteDialog(false);
+  };
 
   return (
     <div className="bg-background shadow-2xl rounded-lg p-6">
@@ -51,7 +57,8 @@ function TaskDeleteDialog({
         Are you sure you want to delete the task:
       </h4>
       <p className="text-sm text-muted-foreground mt-1 text-center">
-        &quot;{task?.title}&quot; created on {formatDate(task?.createdAt as Date)}
+        &quot;{task?.title}&quot; created on{" "}
+        {formatDate(task?.createdAt as Date)}
       </p>
       <div className="flex-1 mt-4 flex justify-center gap-3">
         <Button
@@ -86,24 +93,26 @@ function TaskEditDialog({
   task: Task | null;
   setOpenEditDialog: Dispatch<SetStateAction<boolean>>;
 }) {
-  const updateTask = useTaskStore(state => state.updateTask)
+  const updateTask = useTaskStore((state) => state.updateTask);
 
   const [formData, setFormData] = useState<FormData>({
     title: task?.title ?? "",
     priority: task?.priority ?? "low",
     // ensure dueDate is a YYYY-MM-DD string for the date input
-    dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    description: task?.description ?? ""
-  })
+    dueDate: task?.dueDate
+      ? new Date(task.dueDate).toISOString().split("T")[0]
+      : new Date().toISOString().split("T")[0],
+    description: task?.description ?? "",
+  });
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string,
     field: keyof FormData
   ) => {
-    const value = typeof e === 'string' ? e : e.target.value;
-    setFormData(prev => ({
+    const value = typeof e === "string" ? e : e.target.value;
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -119,74 +128,87 @@ function TaskEditDialog({
     });
 
     setOpenEditDialog(false);
-  }
+  };
 
   return (
-        <div className="bg-background p-6 rounded-lg relative">
-          <FieldSet>
-            <FieldLegend>Edit Task Details</FieldLegend>
-            <FieldGroup>
-              <Field>
-                <FieldLabel>Task title</FieldLabel>
-                <Input
-                  id="title"
-                  autoComplete="off"
-                  placeholder="Enter your task"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange(e, 'title')}
-                  required
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Priority</FieldLabel>
-                <Select
-                  onValueChange={(value) => handleInputChange(value, 'priority')}
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose severity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Field>
-                <FieldLabel>Due date</FieldLabel>
-                <Input 
-                  type="date" 
-                  value={formData.dueDate}
-                  onChange={(e) => handleInputChange(e, 'dueDate')}
-                  required
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Description <span>(optional)</span></FieldLabel>
-                <Textarea
-                  id="checkout-7j9-optional-comments"
-                  placeholder="What are you up to?"
-                  className="resize-none"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange(e, 'description')}
-                />
-              </Field>
-              <Field orientation="horizontal">
-                <Button className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1" onClick={confirmTaskUpdate}>
-                    Save
-                </Button>
-                <Button variant={"outline"} className="shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1" onClick={() => setOpenEditDialog(false)}>
-                  Cancel
-                </Button>
-              </Field>
-            </FieldGroup>
-          </FieldSet>
-          <Button variant={"outline"} className="absolute top-4 right-5 cursor-pointer shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1" onClick={() => setOpenEditDialog(false)}>
-            <X width={12} height={12}/>
-          </Button>
-        </div>
-  )
+    <div className="bg-background p-6 rounded-lg relative">
+      <FieldSet>
+        <FieldLegend>Edit Task Details</FieldLegend>
+        <FieldGroup>
+          <Field>
+            <FieldLabel>Task title</FieldLabel>
+            <Input
+              id="title"
+              autoComplete="off"
+              placeholder="Enter your task"
+              value={formData.title}
+              onChange={(e) => handleInputChange(e, "title")}
+              required
+            />
+          </Field>
+          <Field>
+            <FieldLabel>Priority</FieldLabel>
+            <Select
+              onValueChange={(value) => handleInputChange(value, "priority")}
+              required
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose severity" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field>
+            <FieldLabel>Due date</FieldLabel>
+            <Input
+              type="date"
+              value={formData.dueDate}
+              onChange={(e) => handleInputChange(e, "dueDate")}
+              required
+            />
+          </Field>
+          <Field>
+            <FieldLabel>
+              Description <span>(optional)</span>
+            </FieldLabel>
+            <Textarea
+              id="checkout-7j9-optional-comments"
+              placeholder="What are you up to?"
+              className="resize-none"
+              value={formData.description}
+              onChange={(e) => handleInputChange(e, "description")}
+            />
+          </Field>
+          <Field orientation="horizontal">
+            <Button
+              className="shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1"
+              onClick={confirmTaskUpdate}
+            >
+              Save
+            </Button>
+            <Button
+              variant={"outline"}
+              className="shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
+              onClick={() => setOpenEditDialog(false)}
+            >
+              Cancel
+            </Button>
+          </Field>
+        </FieldGroup>
+      </FieldSet>
+      <Button
+        variant={"outline"}
+        className="absolute top-4 right-5 cursor-pointer shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
+        onClick={() => setOpenEditDialog(false)}
+      >
+        <X width={12} height={12} />
+      </Button>
+    </div>
+  );
 }
 
 export default function TaskListComponent({ tasks }: { tasks: Task[] }) {
@@ -214,7 +236,16 @@ export default function TaskListComponent({ tasks }: { tasks: Task[] }) {
   return (
     <div className="mt-6 space-y-2">
       {tasks.length === 0 ? (
-        <p className="text-center text-gray-500">No tasks found</p>
+        <div className="mt-10 flex flex-col items-center justify-center">
+          <Image
+            className=""
+            width={120}
+            height={100}
+            src={"/sloth-nap.png"}
+            alt="No tasks"
+          />
+          <p className="text-center text-gray-500">No tasks found</p>
+        </div>
       ) : (
         tasks.map((task) => (
           <div

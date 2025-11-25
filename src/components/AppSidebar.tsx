@@ -35,7 +35,7 @@ const items = [
   },
   {
     title: "Notebooks",
-    url: "#",
+    url: "/notebooks",
     icon: Book,
   },
 ];
