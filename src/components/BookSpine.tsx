@@ -1,7 +1,9 @@
 'use client';
 
 import { NoteBook } from "@/types";
+import _ from "lodash";
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
 
 interface BookSpineProps {
   notebook: NoteBook;
@@ -18,6 +20,7 @@ export default function BookSpine({
   const seed = parseInt(notebook.id);
   const lean = ((seed % 3) - 1) * 2; // -2, 0, or 2 degrees
   const offset = ((seed % 4) - 2) * 4; // Slight vertical offset
+  const navigate = useRouter()
 
   const bookVariants = {
     initial: {
@@ -57,8 +60,8 @@ export default function BookSpine({
       style={{
         perspective: '1000px',
       }}
+      onClick={() => navigate.push(`notebooks/editor/${notebook.id}`)}
     >
-      {/* Book spine */}
       <div
         className="relative w-16 h-56 rounded-sm overflow-hidden shadow-lg transition-all"
         style={{
@@ -100,7 +103,7 @@ export default function BookSpine({
               textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
             }}
           >
-            {notebook.title}
+            {_.truncate(notebook.title, { length: 15 })}
           </div>
         </motion.div>
 

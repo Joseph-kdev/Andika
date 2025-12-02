@@ -8,10 +8,18 @@ export interface Note {
   isPinned?: boolean;
 }
 
-export interface NoteBook {
+export interface Page {
   id: string;
   title: string;
   content: string;
+  createdAt: string;
+  modifiedAt: string;
+}
+
+export interface NoteBook {
+  id: string;
+  title: string;
+  pages: Page[];
   createdAt: string;
   modifiedAt: string;
   color: string;

@@ -113,7 +113,7 @@ export default function Bookshelf({ notebooks, onCreateNew }: BookshelfProps) {
               className="relative pb-4"
             >
               {/* Books on this shelf */}
-              <div className="flex items-end justify-center gap-3 min-h-64 px-4  shadow-inner shadow-black/20 rounded-md mt-4">
+              <div className="flex items-end justify-center gap-3 min-h-64 px-4 shadow-inner shadow-black/20 rounded-md mt-4">
                 {shelfBooks.length === 0 ? (
                   <div className="flex-1 h-60 flex items-center justify-center text-amber-900/30 text-sm bg-[url('/abstract-paper.svg')] bg-center bg-cover">
                     <div className="absolute inset-0 bg-white/80 z-20"></div>

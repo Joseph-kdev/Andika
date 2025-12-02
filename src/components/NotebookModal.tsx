@@ -4,9 +4,10 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 import { Button } from "./ui/button";
+import _ from "lodash";
 
 const COLORS = [
-  "#8B4513", // Saddle Brown
+  "hsl(24.999999999999996, 75.9493670886076%, 30.98039215686274%)", // Saddle Brown
   "#2F4F2F", // Dark Slate Gray
   "#1E3A8A", // Deep Blue
   "#4A4A4A", // Dark Gray
@@ -156,7 +157,7 @@ export default function NewNotebookModal({
                       textShadow: "0 1px 3px rgba(0, 0, 0, 0.5)",
                     }}
                   >
-                    {title || "Title"}
+                    {_.truncate(title, { length: 15 }) || "Title"}
                   </div>
                 </div>
               </div>
