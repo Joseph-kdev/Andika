@@ -258,6 +258,21 @@ export function SimpleEditor({ content, onChange} : EditorProps) {
     }
   })
 
+  // Keep editor content in sync when the `content` prop changes.
+  React.useEffect(() => {
+    if (!editor) return
+    try {
+      const current = editor.storage?.markdown?.getMarkdown?.()
+      if (typeof current === "string" && content !== current) {
+        // Replace editor content without triggering history
+        editor.commands.setContent(content ?? "", false)
+      }
+    } catch (e) {
+      // If editor storage isn't ready yet, ignore and wait for next render
+      console.error("Failed to sync editor content:", e)
+    }
+  }, [content, editor])
+
   const rect = useCursorVisibility({
     editor,
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,

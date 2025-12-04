@@ -1,51 +1,94 @@
 "use client";
 
-import { useNoteStore } from "@/stores/useNoteStore";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useParams } from "next/navigation";
+import _ from "lodash";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { useState, useRef, useEffect } from "react";
+import { useNotebookStore } from "@/stores/useNotebookStore";
+import { PlusIcon } from "@/components/ui/plus";
+import { motion } from "motion/react";
+import { formatDate } from "@/lib/utils";
+import { Page } from "@/types";
 import Editor from "@/components/editor";
 import { v4 as uuid4 } from "uuid";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
-import rehypeSanitize from "rehype-sanitize";
-import remarkBreaks from "remark-breaks";
-import _ from "lodash";
-import { useSidebar } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
+import { ChevronRight, ChevronsRight, ChevronLeft, Flame } from "lucide-react";
+import { useAnalytics } from "@/hooks/use-analytics";
+import Image from "next/image";
 
 export default function EditingPage() {
   const { id } = useParams<{ id: string }>();
-  const notes = useNoteStore((state) => state.notes);
-  const note = notes.find((n) => n.id === id);
-  const updateNote = useNoteStore((state) => state.updateNote);
-  const addNote = useNoteStore((state) => state.addNote);
-  const router = useRouter();
-  const [title, setTitle] = useState(note?.title || "");
   const [isSaving, setIsSaving] = useState(false);
-  const contentRef = useRef(note?.content || "");
-  const hasUnsavedChanges = useRef(false);
+  const [isPagesOpen, setIsPagesOpen] = useState(true);
   const { state: sidebarState } = useSidebar();
+  const { notebooks, addPage, updatePage } = useNotebookStore();
+  const book = notebooks.find((book) => book.id === id);
+  const [pageTitle, setPageTitle] = useState("");
+  const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
+  const [selectedPage, setSelectedPage] = useState<Page | null>(null);
+  const contentRef = useRef("");
+  const hasUnsavedChanges = useRef(false);
+  const analytics = useAnalytics();
 
-  const handleTitleChange = (newTitle: string) => {
-    setTitle(newTitle);
-    updateNote(id, { title: newTitle });
+  // Initialize with first page when book loads
+  useEffect(() => {
+    if (book && book.pages.length > 0 && !selectedPage) {
+      const firstPage = book.pages[0];
+      setSelectedPageId(firstPage.id);
+      setSelectedPage(firstPage);
+      setPageTitle(firstPage.title);
+      contentRef.current = firstPage.content;
+    }
+  }, [book?.id]);
+
+  // Update selected page when book pages change
+  useEffect(() => {
+    if (book && selectedPageId) {
+      const updatedPage = book.pages.find((p) => p.id === selectedPageId);
+      if (updatedPage) {
+        setSelectedPage(updatedPage);
+        setPageTitle(updatedPage.title);
+        contentRef.current = updatedPage.content;
+      }
+    }
+  }, [book?.pages, selectedPageId]);
+
+  const onSelectPage = (page: Page) => {
+    // Save current page if there are unsaved changes
+    if (hasUnsavedChanges.current && selectedPage) {
+      updatePage(id, selectedPage.id, {
+        title: pageTitle,
+        content: contentRef.current,
+      });
+      hasUnsavedChanges.current = false;
+    }
+
+    // Get the fresh page data from the updated store
+    const updatedBook = notebooks.find((b) => b.id === id);
+    const freshPage = updatedBook?.pages.find((p) => p.id === page.id);
+
+    if (freshPage) {
+      setSelectedPageId(freshPage.id);
+      setSelectedPage(freshPage);
+      setPageTitle(freshPage.title);
+      contentRef.current = freshPage.content;
+    }
   };
 
   const handleSave = () => {
+    if (!selectedPage) return;
+
     try {
       setIsSaving(true);
-      updateNote(id, {
-        title,
+      updatePage(id, selectedPage.id, {
+        title: pageTitle,
         content: contentRef.current,
       });
-
       hasUnsavedChanges.current = false;
 
       setTimeout(() => {
         setIsSaving(false);
-      }, 1000);
+      }, 800);
     } catch (error) {
       setIsSaving(false);
       console.error("Failed to save:", error);
@@ -53,153 +96,212 @@ export default function EditingPage() {
   };
 
   const createNew = () => {
-    const noteId = uuid4();
-    addNote({
-      id: noteId,
-      title: "",
-      content: "",
-      createdAt: new Date().toISOString(),
-      modifiedAt: new Date().toISOString(),
-      tag: ''
-    });
-    router.push(`/notes/editor/${noteId}`);
-  };
-
-  // Handle missing note
-  useEffect(() => {
-    if (!note) {
-      router.push("/notes");
+    // Save current page if there are unsaved changes
+    if (hasUnsavedChanges.current && selectedPage) {
+      updatePage(id, selectedPage.id, {
+        title: pageTitle,
+        content: contentRef.current,
+      });
+      hasUnsavedChanges.current = false;
     }
-  }, [note]);
+
+    const newPage: Omit<Page, "id" | "createdAt" | "modifiedAt"> = {
+      title: "Untitled Page",
+      content: "",
+    };
+
+    addPage(id, newPage);
+
+    // Update local state with the new page
+    const updatedBook = notebooks.find((b) => b.id === id);
+    if (updatedBook && updatedBook.pages.length > 0) {
+      const addedPage = updatedBook.pages[updatedBook.pages.length - 1];
+      setSelectedPageId(addedPage.id);
+      setSelectedPage(addedPage);
+      setPageTitle(addedPage.title);
+      contentRef.current = addedPage.content;
+    }
+  };
 
   return (
     <div
-      className={`flex h-screen w-screen ${
+      className={`flex px-4 w-full min-h-screen relative border my-2 shadow-2xl rounded-md py-2 gap-2 md:gap-4 pt-10 ${
         sidebarState === "expanded"
           ? "md:w-[calc(100vw-16rem)]"
           : "md:w-[calc(100vw-5rem)]"
       }`}
     >
-      {/* Notes List - Hidden on mobile */}
-      <div
-        className={`hidden md:block overflow-y-auto transition-all duration-300 ${
-          sidebarState === "expanded" ? "md:w-1/3 mx-1" : "md:w-1/4 mx-2"
-        }`}
-      >
-        <button
-          onClick={createNew}
-          className="border w-full flex items-center p-2 gap-4 cursor-pointer hover:bg-gray-50 rounded-4xl"
-        >
-          <svg
-            width="24px"
-            height="24px"
-            strokeWidth="1.5"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            color="#000000"
-          >
-            <path
-              d="M8 12H12M16 12H12M12 12V8M12 12V16"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
-            <path
-              d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-              stroke="#000000"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
-          </svg>
-          <p>Create New</p>
-        </button>
-        <ul className="mt-2">
-          {notes.map((n) => (
-            <li
-              className={`px-2 py-4 shadow-md cursor-pointer rounded-xl ${
-                id === n.id ? "bg-gray-800 text-white" : ""
-              }`}
-              key={n.id}
-              onClick={() => router.push(`/notes/editor/${n.id}`)}
-            >
-              <h2 className="text-xl font-semibold">{n.title || "Untitled"}</h2>
-              <div className="text-sm mt-1">
-                <Markdown
-                  remarkPlugins={[remarkGfm, remarkBreaks]}
-                  rehypePlugins={[rehypeRaw, rehypeSanitize]}
-                >
-                  {_.truncate(n.content, { length: 50, omission: "..." })}
-                </Markdown>
-              </div>
-              <div>
-                <p>{formatDate(n.modifiedAt)}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+      <div className={`absolute top-0 w-full ${!isPagesOpen && "text-center"}`}>
+        <p className="p-2">{book?.title}</p>
+      </div>
+      <div className="absolute right-2 top-0 flex items-center">
+        <div className="p-2 rounded-full flex justify-center items-center">
+          <Flame
+            className="w-5 h-5"
+            fill={analytics.streak.days > 0 ? "#ff9a00" : "none"}
+            stroke={analytics.streak.days > 0 ? "#ff5900c0" : "black"}
+          />
+          <p className="">{analytics.streak.days}</p>
+        </div>
+        <SidebarTrigger className="md:hidden" />
       </div>
 
-      {/* Editor Area */}
       <div
-        className={`flex-1 overflow-hidden transition-all duration-300 ${
-          sidebarState === "expanded" ? "md:w-2/3" : "md:w-3/4"
+        className={`overflow-y-auto transition-all duration-300 ${
+          isPagesOpen
+            ? sidebarState === "expanded"
+              ? "w-1/3"
+              : "w-1/3"
+            : "hidden"
         }`}
       >
-        <div className="px-2">
-          <div className="flex w-full justify-center">
+        <Button
+          onClick={createNew}
+          className="w-full flex items-center p-2 gap-1 md:gap-4 cursor-pointer rounded-4xl shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1 text-xs md:text-sm"
+        >
+          <PlusIcon />
+          <p>New Page</p>
+        </Button>
+        {book?.pages.length == 0 ? (
+          <div className="p-4 text-center flex flex-col items-center gap-2 mt-2">
+            <Image
+              className=""
+              width={100}
+              height={50}
+              src={"/paper-pad.svg"}
+              alt="No pages"
+            />
+            <p className="text-xs md:text-sm text-gray-600 mt-2">
+              No pages yet. Create one to get started.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2 py-2 mt-2">
+            {book?.pages.map((page) => (
+              <motion.button
+                key={page.id}
+                onClick={() => onSelectPage(page)}
+                whileHover={{ x: 4 }}
+                className={`w-full text-left p-3 rounded-lg transition-colors ${
+                  selectedPageId === page.id
+                    ? "bg-secondary border-l-4 border-muted-foreground"
+                    : "hover:bg-gray-100 border-l-4 border-transparent"
+                }`}
+              >
+                <h3 className="font-medium text-sm text-gray-900 truncate">
+                  {page.title}
+                </h3>
+                <p className="text-xs text-gray-500 mt-2">
+                  {formatDate(page.modifiedAt)}
+                </p>
+              </motion.button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div
+        className={`w-full overflow-hidden flex flex-col transition-all duration-300 ${
+          isPagesOpen
+            ? sidebarState === "expanded"
+              ? "w-2/3 md:max-w-5xl mx-auto"
+              : "w-2/3 md:max-w-5xl mx-auto"
+            : "w-2/3 md:max-w-5xl mx-auto"
+        }`}
+      >
+        {book?.pages.length === 0 ? (
+          <div className="flex-1 flex justify-center items-center">
+            <div>
+              <Image
+                className=""
+                width={200}
+                height={160}
+                src={"/sloth-lap.png"}
+                alt="No pages"
+              />
+              <p className="text-xs md:text-sm text-gray-600 mt-2">Lets goooooo, make a page.</p>
+            </div>
+          </div>
+        ) : (
+          <div>
             <div
-              className={`mb-2 flex justify-between w-full transition-all duration-300 ${
-                sidebarState === "collapsed"
-                  ? "md:min-w-[940px]"
-                  : "md:min-w-[748px]"
-              }`}
+              className={`flex justify-between items-end transition-all duration-300 relative flex-wrap gap-2`}
             >
-              <div className="flex-1">
+              <div className="absolute top-0 flex items-center gap-1 justify-start">
+                <Button
+                  onClick={() => setIsPagesOpen(!isPagesOpen)}
+                  variant="outline"
+                  className="p-2 h-auto w-auto hover:bg-transparent cursor-pointer shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
+                >
+                  {isPagesOpen ? <ChevronLeft /> : <ChevronRight />}
+                </Button>
+                <ChevronsRight width={16} />
+                <p className="text-xs truncate">
+                  {_.truncate(book?.title, { length: 15 })}
+                </p>
+                <ChevronRight width={16} />
+                <p className="text-xs truncate">
+                  {_.truncate(selectedPage?.title, { length: 15 })}
+                </p>
+              </div>
+              <div className="flex-1 mt-12 min-w-0">
                 <input
                   type="text"
-                  value={title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="Note title"
-                  className="w-1/2 pb-2 focus:outline-none text-xl"
+                  value={pageTitle}
+                  onChange={(e) => {
+                    setPageTitle(e.target.value);
+                    hasUnsavedChanges.current = true;
+                  }}
+                  placeholder="Page title"
+                  className="w-full focus:outline-none text-lg font-semibold"
                 />
-                <hr className="my-1 w-1/2" />
               </div>
               <Button
-                className={`mr-2 border pb-2 cursor-pointer ${
+                className={`shadow-[0_4px_0_var(--foreground)] active:shadow-none active:translate-y-1 transition-all flex-shrink text-xs h-6 ${
                   isSaving
-                    ? "bg-green-500 border-green-500"
+                    ? "bg-green-500 border-green-500 text-white"
                     : "border-amber-500"
                 }`}
                 onClick={handleSave}
-                variant={"secondary"}
+                variant={"default"}
               >
                 {isSaving ? "Saved!" : "Save"}
               </Button>
             </div>
+            <div
+              className={`md:max-w-5xl mx-auto mt-1 ${
+                isPagesOpen ? "w-full overflow-x-auto" : "w-full"
+              }`}
+            >
+              {selectedPage ? (
+                <Editor
+                  content={selectedPage.content}
+                  contentRef={contentRef}
+                  hasUnsavedChanges={hasUnsavedChanges}
+                  onContentChange={(pageId, updates) => {
+                    // Persist incoming autosave content to the notebook store
+                    contentRef.current = updates.content;
+                    hasUnsavedChanges.current = false;
+                    try {
+                      updatePage(id, pageId, {
+                        content: updates.content,
+                      });
+                    } catch (err) {
+                      console.error("Failed to autosave page content:", err);
+                    }
+                  }}
+                  noteId={selectedPage.id}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-muted-foreground">
+                    No pages yet. Create one to get started.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-          <div
-            className={`mx-auto transition-all duration-300 ${
-              sidebarState === "collapsed"
-                ? "md:min-w-[960px]"
-                : "md:min-w-[748px]"
-            }`}
-          >
-            {note ? (
-              <Editor
-                content={note.content}
-                contentRef={contentRef}
-                hasUnsavedChanges={hasUnsavedChanges}
-                onContentChange={updateNote}
-                noteId={id}
-              />
-            ) : (
-              <div>loading..</div>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
