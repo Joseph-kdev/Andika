@@ -12,7 +12,7 @@ import { formatDate } from "@/lib/utils";
 import { Page } from "@/types";
 import Editor from "@/components/editor";
 import { v4 as uuid4 } from "uuid";
-import { ChevronRight, ChevronsRight, ChevronLeft, Flame } from "lucide-react";
+import { ChevronRight, ChevronsRight, ChevronLeft, Flame, TrashIcon } from "lucide-react";
 import { useAnalytics } from "@/hooks/use-analytics";
 import Image from "next/image";
 
@@ -21,7 +21,7 @@ export default function EditingPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isPagesOpen, setIsPagesOpen] = useState(true);
   const { state: sidebarState } = useSidebar();
-  const { notebooks, addPage, updatePage } = useNotebookStore();
+  const { notebooks, addPage, updatePage, deletePage } = useNotebookStore();
   const book = notebooks.find((book) => book.id === id);
   const [pageTitle, setPageTitle] = useState("");
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
@@ -123,6 +123,46 @@ export default function EditingPage() {
     }
   };
 
+  const openPageDelete = (pageId : string) => {
+    const page = book?.pages.find((p) => p.id === pageId) ?? null
+    setPageToDelete(page)
+    setOpenDeleteDialog(true)
+  }
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [pageToDelete, setPageToDelete] = useState<Page | null>(null)
+
+  const confirmDelete = () => {
+    if (!pageToDelete) return
+
+    try {
+      // remove from store
+      deletePage(id, pageToDelete.id)
+
+      // compute remaining pages (based on current book state)
+      const remaining = (book?.pages ?? []).filter((p) => p.id !== pageToDelete.id)
+
+      if (remaining.length > 0) {
+        const next = remaining[0]
+        setSelectedPageId(next.id)
+        setSelectedPage(next)
+        setPageTitle(next.title)
+        contentRef.current = next.content
+      } else {
+        setSelectedPageId(null)
+        setSelectedPage(null)
+        setPageTitle("")
+        contentRef.current = ""
+      }
+
+      setOpenDeleteDialog(false)
+      setPageToDelete(null)
+    } catch (err) {
+      console.error("Failed to delete page:", err)
+      setOpenDeleteDialog(false)
+    }
+  }
+
   return (
     <div
       className={`flex px-4 w-full min-h-screen relative border my-2 shadow-2xl rounded-md py-2 gap-2 md:gap-4 pt-10 ${
@@ -133,6 +173,40 @@ export default function EditingPage() {
     >
       <div className={`absolute top-0 w-full ${!isPagesOpen && "text-center"}`}>
         <p className="p-2">{book?.title}</p>
+      {openDeleteDialog && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 backdrop-blur flex justify-center items-center z-50"
+        >
+          <div className="bg-background shadow-2xl rounded-lg p-6 relative w-[90%] max-w-md">
+            <div className="flex-1 flex justify-center my-6">
+              <Image width={260} height={260} src="/delete-ilt.svg" alt="delete svg" />
+            </div>
+            <h4 className="font-medium text-center mt-2">Are you sure you want to delete this page?</h4>
+            <p className="text-sm text-muted-foreground mt-1 text-center">&quot;{pageToDelete?.title}&quot;</p>
+            <div className="flex-1 mt-4 flex justify-center gap-3">
+              <Button
+                variant={"destructive"}
+                className="shadow-[0_4px_0_var(--secondary-two)] active:shadow-none active:translate-y-1"
+                onClick={() => {
+                  confirmDelete()
+                }}
+              >
+                Delete
+              </Button>
+              <Button
+                variant={"outline"}
+                className="shadow-[0_4px_0_var(--ring)] active:shadow-none active:translate-y-1"
+                onClick={() => setOpenDeleteDialog(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      )}
       </div>
       <div className="absolute right-2 top-0 flex items-center">
         <div className="p-2 rounded-full flex justify-center items-center">
@@ -182,7 +256,7 @@ export default function EditingPage() {
                 key={page.id}
                 onClick={() => onSelectPage(page)}
                 whileHover={{ x: 4 }}
-                className={`w-full text-left p-3 rounded-lg transition-colors ${
+                className={`w-full text-left p-3 rounded-lg transition-colors relative ${
                   selectedPageId === page.id
                     ? "bg-secondary border-l-4 border-muted-foreground"
                     : "hover:bg-gray-100 border-l-4 border-transparent"
@@ -191,9 +265,16 @@ export default function EditingPage() {
                 <h3 className="font-medium text-sm text-gray-900 truncate">
                   {page.title}
                 </h3>
-                <p className="text-xs text-gray-500 mt-2">
-                  {formatDate(page.modifiedAt)}
-                </p>
+                <div className="flex flex-col gap-1 md:flex-row md:items-baseline md:justify-between">
+                  <p className="text-xs text-gray-500 mt-2">
+                    {formatDate(page.modifiedAt)}
+                  </p>
+                  {selectedPageId === page.id && (
+                    <div className="" onClick={() => openPageDelete(page.id)}>
+                      <TrashIcon className="w-4 h-4 text-gray-600 cursor-pointer"/>
+                    </div>
+                  )}
+                </div>
               </motion.button>
             ))}
           </div>

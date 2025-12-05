@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { NoteBook } from "@/types";
 import BookSpine from "./BookSpine";
 import { PlusIcon } from "./ui/plus";
+import Image from "next/image";
 
 interface BookshelfProps {
   notebooks: NoteBook[];
@@ -115,11 +116,16 @@ export default function Bookshelf({ notebooks, onCreateNew }: BookshelfProps) {
               {/* Books on this shelf */}
               <div className="flex items-end justify-center gap-3 min-h-64 px-4 shadow-inner shadow-black/20 rounded-md mt-4">
                 {shelfBooks.length === 0 ? (
-                  <div className="flex-1 h-60 flex items-center justify-center text-amber-900/30 text-sm bg-[url('/abstract-paper.svg')] bg-center bg-cover">
+                  <div className="flex-1 h-60 flex flex-col items-center justify-center text-amber-900/30 text-sm bg-[url('/abstract-paper.svg')] bg-center bg-cover">
                     <div className="absolute inset-0 bg-white/80 z-20"></div>
-                    <p className="z-40 text-foreground">
-                      Empty shelf
-                    </p>
+                      <Image
+                        className="z-30"
+                        width={260}
+                        height={100}
+                        src={"/empty-shelves.png"}
+                        alt="empty shelves"
+                      />
+                    <p className="z-40 text-foreground absolute bottom-20">Empty shelf</p>
                   </div>
                 ) : (
                   shelfBooks.map((notebook, bookIndex) => (
